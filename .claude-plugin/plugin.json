@@ -1,0 +1,20 @@
+{
+  "name": "motionable",
+  "version": "0.1.0",
+  "description": "Hype videos for your product, drawn in code on your Mac: reads your app or website, plans a beat-synced film you approve, composes original music, and renders the MP4. macOS only, nothing to install.",
+  "author": {
+    "name": "Christian Patrick Suntay"
+  },
+  "keywords": [
+    "video",
+    "motion-graphics",
+    "hype-video",
+    "launch-video",
+    "macos",
+    "swift",
+    "app-store"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/suntay44/motionable",
+  "homepage": "https://github.com/suntay44/motionable"
+}

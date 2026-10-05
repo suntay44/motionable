@@ -1,0 +1,16 @@
+{
+  "name": "motionable",
+  "owner": {
+    "name": "Christian Patrick Suntay"
+  },
+  "metadata": {
+    "description": "motionable: hype videos drawn in code on your Mac (macOS only)."
+  },
+  "plugins": [
+    {
+      "name": "motionable",
+      "source": "./",
+      "description": "Hype videos for your product, drawn in code on your Mac."
+    }
+  ]
+}
