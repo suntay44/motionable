@@ -12,7 +12,7 @@ Free · open source · macOS only · nothing to install
 
 <br />
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg) ![Release](https://img.shields.io/github/v/release/suntay44/Plannable)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg) ![Release](https://img.shields.io/github/v/release/suntay44/motionable)
 
 
 <br />
