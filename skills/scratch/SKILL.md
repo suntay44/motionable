@@ -1,6 +1,6 @@
 ---
 name: scratch
-description: Make a hype video for a product from scratch, by answering a few questions and dropping in a logo and screenshots. Interviews the user (product, pitch, features, length, format, platforms, what to show first), then plans, scores and renders an original motion-graphics MP4 on macOS. Use when the user wants a hype, launch or promo video and has no website or project folder to point at.
+description: "Make a hype/launch/promo video from scratch: interviews the user and takes a logo and screenshots, then plans, scores and renders an original motion-graphics MP4 on macOS."
 argument-hint: "[product name]"
 ---
 

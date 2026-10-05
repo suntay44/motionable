@@ -1,6 +1,6 @@
 ---
 name: website
-description: Make a hype video for a product from its website URL. Reads the site (name, pitch, features, pricing, colours, logo, screenshots, store links), asks only for what's missing, requests any extra screenshots needed, then plans, scores and renders an original motion-graphics MP4 on macOS. Use when the user gives a website or landing page for the product they want a hype, launch or promo video for.
+description: "Make a hype/launch/promo video from a website URL: reads the site (pitch, features, colours, logo, screenshots, store links), asks only what's missing, then renders an MP4 on macOS."
 argument-hint: "<website URL>"
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "motionable",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Hype videos for your product, drawn in code on your Mac: reads your app or website, plans a beat-synced film you approve, composes original music, and renders the MP4. macOS only, nothing to install.",
   "author": {
     "name": "Christian Patrick Suntay"

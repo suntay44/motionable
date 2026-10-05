@@ -1,6 +1,6 @@
 ---
 name: project
-description: Make a hype video for a product from a folder on this Mac, such as its code repo or a folder of screenshots and notes, without opening a session there. Reads the folder (README, app metadata, store listing drafts, icons, screenshots, colours), asks only for what's missing, then plans, scores and renders an original motion-graphics MP4 into the current studio folder. Use when the user points at a project path for a hype, launch or promo video.
+description: "Make a hype/launch/promo video from a folder on this Mac (a repo or screenshots and notes), read-only: learns the product, asks only what's missing, then renders an MP4."
 argument-hint: "<path to the product's folder>"
 ---
 

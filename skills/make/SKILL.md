@@ -1,6 +1,6 @@
 ---
 name: make
-description: The motionable pipeline that the scratch, website and project skills hand off to. Plans a hype video (style plus a beat grid the user approves), writes the scenes on the Swift engine, scores original music in code, critiques contact sheets, then renders the MP4. Start with /motionable:scratch, /motionable:website or /motionable:project instead of calling this directly.
+description: "Internal motionable pipeline (plan, approve, scenes, music, critique, render). Start with /motionable:scratch, :website or :project instead."
 user-invocable: false
 ---
 
