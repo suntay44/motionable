@@ -1,9 +1,24 @@
-# motionable
+<div align="center">
+<img width="1774" height="887" alt="motionable" src="https://github.com/user-attachments/assets/a041873e-1d21-4ec4-b69a-d9ff04dee422" />
+
+### ⭐ Stars are appreciated! ⭐
+
+**One shot Hype Video with the latest AI Models**
 
 **Hype videos for your product, drawn in code on your Mac.**
 A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders a ready-to-post MP4.
 
 Free · open source · macOS only · nothing to install
+
+<br />
+
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg) ![Release](https://img.shields.io/github/v/release/suntay44/Plannable)
+
+
+<br />
+</div>
+
+
 
 ## Install
 
