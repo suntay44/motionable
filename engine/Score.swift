@@ -14,6 +14,15 @@ final class Score {
     let fx = Bus()
     /// Sound effects tied to picture events.
     let sfx = Bus()
+    /// Send to the room (reverb) and to the tempo echo; set by `compose`, or add to them directly.
+    let verb = Bus()
+    let echo = Bus()
+    /// The room, the master's colour, and how hard the groove pumps under the kick.
+    var space: Space = .dry
+    var colour: Colour = .clean
+    var duckDepth: Double = 0.6
+    /// Echo length in beats (0.75 = dotted eighth).
+    var echoBeats: Double = 0.75
     /// Kick times, for the sidechain duck.
     var kicks: [Double] = []
     /// Ranges where the music goes underwater (low-passed and quieter).
@@ -22,6 +31,8 @@ final class Score {
     var fadeOut: (from: Double, to: Double)?
     /// How loud effects sit against the music.
     var sfxLevel: Float = 1.8
+    /// `video effects`: only the sound effects, at the level they have in the full mix (for a platform sound or licensed track on top).
+    var effectsOnly = false
     private(set) var hits: [Hit] = []
 
     init(bpm: Double) { self.bpm = bpm }
@@ -71,10 +82,12 @@ final class Score {
         for k in kicks {
             let i0 = n(k)
             for j in 0..<n(0.3) where i0 + j < NS && i0 + j >= 0 {
-                duck[i0 + j] = min(duck[i0 + j], Float(1 - 0.6 * exp(-x(j) / 0.07)))
+                duck[i0 + j] = min(duck[i0 + j], Float(1 - duckDepth * exp(-x(j) / 0.07)))
             }
         }
         for i in 0..<NS { music.l[i] += ducked.l[i] * duck[i]; music.r[i] += ducked.r[i] * duck[i] }
+        applyReverb(verb, into: music, space: space == .dry && verb.l.contains(where: { $0 != 0 }) ? .room : space)
+        applyEcho(echo, into: music, bpm: bpm, beats: echoBeats)
 
         if !muffled.isEmpty {
             var fl = SVF(), fr = SVF()
@@ -94,11 +107,34 @@ final class Score {
             L[i] = music.l[i] + fx.l[i] + sfxLevel * sfx.l[i]
             R[i] = music.r[i] + fx.r[i] + sfxLevel * sfx.r[i]
         }
+        var preGain: Float = 1, capGain: Float = 1
+        if colour != .clean {
+            // Colour expects a signal near full scale: bring the raw mix there first, so saturation is a flavour, not a crush.
+            let raw = max(L.map(abs).max() ?? 1, R.map(abs).max() ?? 1, 1e-6)
+            let k = 0.85 / raw
+            preGain = k
+            for i in 0..<NS { L[i] *= k; R[i] *= k }
+            applyColour(&L, &R, colour)
+        }
         let peak = max(L.map(abs).max() ?? 1, R.map(abs).max() ?? 1, 1e-6)
         for i in 0..<NS {
             let fade = fadeOut.map { Float(1 - prog(x(i), $0.from, $0.to)) } ?? 1
             L[i] = tanhf(1.4 * L[i] / peak) / tanhf(1.4) * 0.92 * fade
             R[i] = tanhf(1.4 * R[i] / peak) / tanhf(1.4) * 0.92 * fade
+        }
+        if colour != .clean {
+            // Coloured mixes (tape, lo-fi…) lose peaks and read louder; cap their loudness so every film sits alike.
+            let r = sqrtf((L.map { $0 * $0 }.reduce(0, +) + R.map { $0 * $0 }.reduce(0, +)) / Float(2 * NS))
+            if r > 0.2 { let k = 0.2 / r; capGain = k; for i in 0..<NS { L[i] *= k; R[i] *= k } }
+        }
+        if effectsOnly {
+            // The same gains as the full mix, applied to the effects alone, so they sit where they did.
+            for i in 0..<NS {
+                let fade = fadeOut.map { Float(1 - prog(x(i), $0.from, $0.to)) } ?? 1
+                let el = (fx.l[i] + sfxLevel * sfx.l[i]) * preGain, er = (fx.r[i] + sfxLevel * sfx.r[i]) * preGain
+                L[i] = tanhf(1.4 * el / peak) / tanhf(1.4) * 0.92 * fade * capGain
+                R[i] = tanhf(1.4 * er / peak) / tanhf(1.4) * 0.92 * fade * capGain
+            }
         }
         // Levels, so a mix can be checked without ears: muffled stretches should read quieter.
         func rms(_ a: Double, _ z: Double) -> Float {
@@ -107,12 +143,12 @@ final class Score {
             let s = L[lo..<hi]
             return sqrtf(s.map { $0 * $0 }.reduce(0, +) / Float(s.count))
         }
-        var report = String(format: "audio: peak %.2f · whole-mix rms %.3f", peak, rms(0, duration))
+        var report = String(format: "audio%@: peak %.2f · whole-mix rms %.3f", effectsOnly ? " (effects only)" : "", peak, rms(0, duration))
         for m in muffled { report += String(format: " · muffled %.1f–%.1f s rms %.3f (just before %.3f)", m.from, m.to, rms(m.from + 0.2, m.to - 0.2), rms(max(0, m.from - 2), m.from)) }
         print(report)
 
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let url = dir.appendingPathComponent("music.m4a")
+        let url = dir.appendingPathComponent(effectsOnly ? "effects.m4a" : "music.m4a")
         try? FileManager.default.removeItem(at: url)
         let fmt = AVAudioFormat(standardFormatWithSampleRate: Double(SR), channels: 2)!
         let file = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatMPEG4AAC, AVSampleRateKey: SR,

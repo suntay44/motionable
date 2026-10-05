@@ -84,35 +84,16 @@ func partial(_ pts: [CGPoint], _ fraction: Double) -> CGPath {
     return p
 }
 
-var fontCache: [String: CTFont] = [:]
-func font(_ size: CGFloat, _ w: NSFont.Weight) -> CTFont {
-    let key = "\(size)-\(w.rawValue)"
-    if let f = fontCache[key] { return f }
-    let f = NSFont.systemFont(ofSize: size, weight: w) as CTFont
-    fontCache[key] = f
-    return f
-}
-func ctLine(_ s: String, _ size: CGFloat, _ w: NSFont.Weight, _ c: Col, kern: CGFloat = 0) -> CTLine {
-    let attrs: [NSAttributedString.Key: Any] = [
-        .font: font(size, w), NSAttributedString.Key(kCTForegroundColorAttributeName as String): c.cg, .kern: kern]
-    return CTLineCreateWithAttributedString(NSAttributedString(string: s, attributes: attrs))
-}
+// SF Pro by weight — kept for films written before Faces existed; everything routes through Fonts.swift.
+func font(_ size: CGFloat, _ w: NSFont.Weight) -> CTFont { ctFont(.system(w), size) }
 func textWidth(_ s: String, _ size: CGFloat, _ w: NSFont.Weight, kern: CGFloat = 0) -> CGFloat {
-    CGFloat(CTLineGetTypographicBounds(ctLine(s, size, w, white, kern: kern), nil, nil, nil))
+    textWidth(s, size, .system(w), kern: kern)
 }
 /// Draws one line of text with its baseline at y; `align` 0 = left, 0.5 = centre, 1 = right.
 @discardableResult
 func text(_ s: String, _ size: CGFloat, _ w: NSFont.Weight, _ c: Col, _ x: CGFloat, _ y: CGFloat,
           align: CGFloat = 0, kern: CGFloat = 0) -> CGFloat {
-    let l = ctLine(s, size, w, c, kern: kern)
-    let width = CGFloat(CTLineGetTypographicBounds(l, nil, nil, nil))
-    ctx.saveGState()
-    ctx.translateBy(x: x - width * align, y: y)
-    ctx.scaleBy(x: 1, y: -1)
-    ctx.textPosition = .zero
-    CTLineDraw(l, ctx)
-    ctx.restoreGState()
-    return width
+    text(s, size, .system(w), c, x, y, align: align, kern: kern)
 }
 func drawImage(_ img: CGImage, in r: CGRect) {
     ctx.saveGState()

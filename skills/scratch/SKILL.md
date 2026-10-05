@@ -23,10 +23,13 @@ Use the **AskUserQuestion** tool if it's available: at most 4 questions per call
 1. The product name exactly as it should appear, and **what it does in one sentence**.
 2. Its **2–4 best features**, in the user's words.
 3. Who it's for, and a price line if any ("Free", "One purchase. No subscription."). Never invent one.
+4. *(Optional)* How people should feel about it, in their own words, and anything it must never feel like. This is evidence for plan mode; don't offer style options.
 
 **Round 2** (clickable):
-4. **Length:** 15 s / 30 s (recommended) / 60 s.
-5. **Format:** 9:16 for Reels, TikTok and Shorts (recommended) / 1:1 / 16:9.
+5. **Where will people watch it?** (sets the format and length; "Other" takes any size or length):
+   - Reels, TikTok, Shorts: 9:16, 30 s, plus a 15 s cut (recommended);
+   - YouTube, a website, a launch post: 16:9, 20–30 s;
+   - Feeds (X, LinkedIn, Instagram): 1:1, 15 s.
 6. **Where it's available:** App Store (live) / Google Play (live) / Web / Not released yet. Allow several. Ask about "Coming soon to …" lines separately and only use them if true.
 7. **What should viewers see first?** Offer the features from round 1.
 
@@ -40,4 +43,4 @@ Ask the user to **drag in, or give paths to: a logo + 3–8 product screenshots*
 
 ## 3. Hand off
 
-Read `ROOT/skills/make/SKILL.md` and follow it from step 1, carrying over the answers, the image paths and the colours. Here every fact's source is "the user".
+Read `ROOT/skills/make/SKILL.md` and follow it from step 1, carrying over the answers, the image paths, the colours and **personality notes** (the user's own words, the logo's style, the screenshots' feel) for plan mode. Here every fact's source is "the user".

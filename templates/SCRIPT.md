@@ -1,15 +1,17 @@
 # {{PRODUCT}} — beat grid
 
-<!-- 120 BPM: one beat = 0.5 s, one bar = 2 s. Every time below becomes a constant in
-scenes/Film.swift's `T`. One row per moment; hard cuts only on beats. Approve this before any
-scene code is written. -->
+<!-- Written in plan mode, at the tempo DIRECTION.md chose: one beat = 60 / BPM seconds, one bar = 4 beats.
+     Every time below becomes a constant in scenes/Film.swift's `T`. One row per moment; joins and hard cuts
+     land on beats; every row has a sound. "Reads in" = characters ÷ 15 + 0.4 s (at least 1 s): the line must stay fully on screen that long after its entrance. Reading should fill no more than about 60 % of the film. Approve this before any scene code is written. -->
 
-| Time (s) | Bar | Picture | Words on screen | Sound |
-|---|---|---|---|---|
-| 0.00 / 0.25 / 0.50 | 1 | <!-- the hook: something already on screen in frame 1 --> | | Impact, stamp per word |
-| | | | | |
-| | | **End card** | **{{PRODUCT}}** · one line · store badge | Thump, final chord |
-| … – end | | **Everything holds still** | | Chord fades |
+**Tempo:** … BPM · beat = … s · bar = … s
+
+| Time (s) | Bar | Beat | Picture (framing) | Words on screen (type entrance) | Reads in (s) | Join into next | Sound |
+|---|---|---|---|---|---|---|---|
+| 0.00 | 1 | Hook | <!-- readable in frame 1; message within 3 s --> | | | | |
+| | | Benefit | **Signature moment** | | | | |
+| | | End card | **Icon · name · line · CTA** | | | | |
+| … – end | | Hold | **Everything holds still** | | | — | |
 
 ## Claims to verify before posting
 

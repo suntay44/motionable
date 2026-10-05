@@ -23,13 +23,14 @@ If no URL was given, ask for one. If the user would rather describe the product,
    - the product name and one-line pitch;
    - the 3–6 headline features, in the site's own words;
    - pricing and the price model;
-   - audience and tone.
+   - audience and tone, with **2–3 lines of its copy quoted exactly** (plan mode reads the voice from them).
 2. **Fetch the raw HTML** with `curl -sL <url>` and pull out:
    - `<title>`, `og:title`, `og:description`, `og:image`;
    - `apple-touch-icon` and other icons, plus `theme-color`;
    - `<img>` sources and their alt text;
    - CSS colour variables and the most-used colours;
-   - font families;
+   - font families (a brand font's file only if the site serves it under a licence that allows reuse);
+   - illustration or mascot style (flat, textured, line, 3D, photo), if any;
    - **store links** (`apps.apple.com/…` means it's on the App Store; `play.google.com/store/apps/…` means it's on Google Play).
 3. **Follow at most 4 same-site pages** that matter, such as Features, Pricing or Screenshots.
 4. **If there's an App Store link,** fetch that public page too. It has the official name, subtitle and screenshot list.
@@ -39,8 +40,10 @@ If no URL was given, ask for one. If the user would rather describe the product,
 Post a short summary: **name, pitch, top features, colours, price, platforms**, plus a list of the images found with what each shows and its size.
 
 Then ask, using **AskUserQuestion** if available (otherwise a numbered chat list), only for what's missing or uncertain:
-- **Length:** 15 s / 30 s (recommended) / 60 s.
-- **Format:** 9:16 (recommended) / 1:1 / 16:9.
+- **Where will people watch it?** (sets the format and length; "Other" takes any size or length):
+  - Reels, TikTok, Shorts: 9:16, 30 s, plus a 15 s cut (recommended);
+  - YouTube, a website, a launch post: 16:9, 20–30 s;
+  - Feeds (X, LinkedIn, Instagram): 1:1, 15 s.
 - **What viewers should see first** (offer the top features).
 - Confirm **platforms and price line**, and any "coming soon" claims. Only use those if true.
 
@@ -55,4 +58,4 @@ Then ask, using **AskUserQuestion** if available (otherwise a numbered chat list
 
 ## 4. Hand off
 
-Read `ROOT/skills/make/SKILL.md` and follow it from step 1, carrying over the facts (each with its source URL), the answers, the image paths and the colours.
+Read `ROOT/skills/make/SKILL.md` and follow it from step 1, carrying over the facts (each with its source URL), the answers, the image paths, the colours and the **personality notes** (voice quotes, fonts, illustration style, the product's world) for plan mode. Don't offer the user style options: plan mode decides from this evidence.

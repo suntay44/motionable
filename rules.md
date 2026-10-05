@@ -27,12 +27,33 @@ Source: [Google Play badge guidelines](https://partnermarketinghub.withgoogle.co
 
 ## Social
 
-11. **Safe zones:** no text in the bottom 20 % or the right 12 % (where TikTok, Reels and Shorts put their buttons).
-12. **The hook is on screen in frame 1.** Never fade in from black.
+11. **Safe zones:** in 9:16, key text stays in the band x 6–90 %, y 14–65 %, which clears Reels' and Shorts' published zones (RESEARCH.md). 16:9 and 1:1 keep their margins. `run.sh <film> check` enforces it.
+12. **The hook is readable in frame 1**, and the message lands within 3 s. Never fade in from black, and never open on a logo slate.
 13. **The last 1–2 s hold perfectly still**, so the final frame works as a thumbnail.
+13b. **Not an App Store preview.** App previews must be footage captured in the app (Apple 2.3.4); motionable videos are ads and launch videos. Never call one an app preview.
 
-## Craft
+## Directed, not templated
 
-14. **No centred headline on a gradient,** except the end card. Prefer one continuous idea (a shape that changes into the next scene) over a slideshow.
-15. **Hard cuts only on the beat.** Every on-screen event has a matching sound, and every musical hit has something that moves.
-16. **Music is original, made in code.** Never use a commercial track or a trending sound. The user can swap in a licensed track later.
+14. **Every look and sound choice is derived:** DIRECTION.md gives each dial a reason that points at evidence about the product (PLAN.md). No presets, and no copying another film, the Owly example included.
+15. **Unique in the studio:** at least 5 fingerprint lines differ from every other film in the studio, and `scripts/compare.sh` reports every other film at 0.85 or below. A series look only if the user asks for one.
+16. **Variety inside the film:** never the same join twice in a row, and at least 3 kinds of join in a 30 s film (2 in a 15 s cut); at least 3 kinds of framing (2 in 15 s) and at least 2 type entrances. No two scenes in a row share the same layout. Each join has a reason; motion for its own sake reads as a template.
+17. **The signature moment:** the product's most visual real interaction is in the film, redrawn to move exactly like the real UI.
+18. **Screens are never sliced:** show them through `drawScreen`, `ScreenMove`, `callout`, `screensRow` or `screensFan`, which fit whole screens or snap crops to the gaps between elements. Never clip a screenshot into a fixed box.
+19. **Hard cuts and joins land on the beat.** Every on-screen event has a matching sound, and every musical hit has something that moves.
+20. **Music is original, made in code.** Never a commercial track or a trending sound; the user can swap in a licensed track later.
+
+## Craft (what viewers reward: RESEARCH.md › community check)
+
+25. **Ease, don't bounce.** Screens, headlines and cards ease out smoothly with no overshoot. Only small accents (stickers, icons, chips) may overshoot, and gently. Never blur text people need to read.
+26. **No strobing.** At most three flashes in any second (WCAG 2.3.1); `check` fails a film that breaks it. Keep flash and glitch joins brief and rare.
+27. **The UI is legible.** When a screen's words carry the message, crop to the part that matters (a region, a callout, a camera move) instead of shrinking the whole screen.
+28. **Vary the shot lengths.** Shots of one length feel mechanical; `check` warns.
+29. **No stock-music formula:** no ukulele and whistling, no swoosh-and-claps "startup" build. The sound comes from the product's world (PLAN.md).
+30. **Brand moments are short.** The icon or logo reveal takes under a second; then the end card holds still.
+
+## Illustrations
+
+21. **Claude-drawn illustrations** are simple SVGs in `assets/drawn/`, in the brand's colours and line style. Draw them only if the user said yes in plan mode.
+22. **Never redraw or alter** the user's logo, mascot, characters or real UI. Use their files.
+23. **Never imitate** another brand's characters, artwork or style signatures.
+24. **An image generator** (an external tool or connector) only if the user has one and chooses it, after being told it may cost money. Its output follows rules 22–23 too.

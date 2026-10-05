@@ -1,80 +1,100 @@
 ---
 name: make
-description: "Internal motionable pipeline (plan, approve, scenes, music, critique, render). Start with /motionable:scratch, :website or :project instead."
+description: "Internal motionable pipeline (plan mode, approval, scenes, music, critique, render). Start with /motionable:scratch, :website or :project instead."
 user-invocable: false
 ---
 
 # motionable: make
 
-You arrive here with facts about a product (each with a source), the user's answers, image paths and colours. Your job is to turn them into a finished film the user is proud to post.
+You arrive here with facts about a product (each with a source), the user's answers, image paths, colours, and notes on its personality. Your job is a finished film that feels like **this** product, and like no other film in the studio.
 
-`ROOT` is the motionable root: `${CLAUDE_PLUGIN_ROOT}`. If that isn't expanded, use the folder two levels above this file's real path (`realpath`), which holds `engine/` and `scripts/`. Before writing scenes, read **`ROOT/ENGINE.md`** (the API), **`ROOT/rules.md`** (hard rules) and **`ROOT/checklist.md`** (critique). The Owly example in `ROOT/examples/owly/` (scenes/Owly.swift, STYLE.md, SCRIPT.md) shows what finished work looks like; borrow its techniques, never its content.
+`ROOT` is the motionable root: `${CLAUDE_PLUGIN_ROOT}`. If that isn't expanded, use the folder two levels above this file's real path (`realpath`), which holds `engine/` and `scripts/`.
 
-## 1. Create the project
+Read **`ROOT/PLAN.md`** (plan mode), **`ROOT/ENGINE.md`** (the ingredients), **`ROOT/rules.md`** (hard rules) and **`ROOT/checklist.md`** (critique) before you plan. `ROOT/examples/owly/` shows what finished work looks like. **Never copy its look, sound or structure**: it is one direction among endless ones.
 
-- **Folder:** films live in the **current folder**, usually the user's studio folder for hype videos. Create `<slug>/` there.
-  - If the current folder *is* the product's own repo (the product folder is `.`), use `motionable/<slug>/` instead, so the repo stays tidy.
+## 1. Create the film
+
+- **Where:** films live in the **current folder** (usually the user's studio for hype videos), as `<slug>/`.
+  - If the current folder is the product's own repo, use `motionable/<slug>/` instead.
   - Never write into a product folder given to `/motionable:project`.
-  - If `<slug>/` already exists, ask: make a new version (`<slug>-2/`), or continue that film?
-- Run `bash ROOT/scripts/new.sh <film folder> "<Product name>"`.
-- Copy the collected images into its `assets/` (and delete a `<slug>-downloads/` folder once copied), with clear names (`logo.png`, `screen-home.png`, `screen-feature.png`…).
-- If the format isn't 9:16, set `width`/`height` in `makeFilm()` and adapt the layout constants.
+  - If `<slug>/` exists, ask: make a new version (`<slug>-2/`), or continue that film?
+- **Create it:** run `bash ROOT/scripts/new.sh <film> "<Product name>"`. It copies the engine into the film and writes the templates.
+- **Assets:** copy the images into `<film>/assets/` with clear names (`logo.png`, `screen-home.png`…). A brand font file, if the user has one, goes in `assets/fonts/`.
 
-## 2. Plan, and get approval before writing scenes
+## 2. Plan mode (internal: no command, no style menu)
 
-**Concept.** Pick one continuous idea that suits this product, for example:
-- a shape that changes into each next scene;
-- a single screenshot the camera travels across;
-- a word that becomes the UI;
-- a before/after that flips.
+Follow **PLAN.md** from start to finish:
+1. **Evidence board and personality.**
+2. **Story:** promise, signature moment, 3 hooks → 1.
+3. **Every dial set, each with its reason.**
+4. **Uniqueness against the studio:** read the other films' `DIRECTION.md` › Fingerprint. Films made before v0.2 have none; treat them as 120 BPM A-minor house with left-aligned headlines over a card.
+5. **Write DIRECTION.md and SCRIPT.md** at the chosen tempo.
 
-Lead with what the user chose to show first. One benefit per scene, building to the end card.
+Do not ask the user to pick a style. The direction comes from the evidence.
 
-**STYLE.md.** Fill in the template: concept, palette with real hex values, type, motion rules, bans, sound.
+## 3. One approval
 
-**SCRIPT.md.** Write the beat grid, one row per moment, at 120 BPM (beat = 0.5 s, bar = 2 s):
+Show the **4-line treatment** (Feel · Sound · Look · Signature moment) and a compact beat grid (time · picture · words · join). Then ask, with **AskUserQuestion** if available (otherwise in chat):
+1. **The plan:** approve, or change something.
+2. **Illustrations:** "Should I draw illustrations for this film?" Yes, illustrate it / A few accents / No, screenshots and type only. Recommend one with a reason (PLAN.md §5).
+   - Drawing them is free: Claude writes SVGs.
+   - Only if the session has an image-generation tool connected, add it as an option, and say it may cost money.
 
-| Time | Bar | Picture | Words | Sound |
-|---|---|---|---|---|
+Write no scene code before approval. A change here is cheap.
 
-Rules for the grid:
-- The hook is on screen in frame 1, and the first second sets up something specific.
-- Hard cuts only on beats, and every row has a sound.
-- Every claim goes on the "Claims to verify" list with its source.
-- The end card has the name, one line, the price line if any, and store availability that follows rules.md.
-- The last 1–2 s hold still.
+## 4. Build
 
-**Show the user a compact version of the grid** (time, picture, words) and ask for approval with AskUserQuestion: approve / change something. Don't write scene code until they approve. This is the cheapest point to change direction.
+1. **Illustrations** (if yes): write the SVGs into `assets/drawn/` in the brand's colours and one line weight (ENGINE.md › Drawn illustrations). Look at each one rendered on a sheet, and redraw anything clumsy.
+2. **`scenes/Film.swift`:** replace the skeleton completely. Every value comes from DIRECTION.md and SCRIPT.md:
+   - the times go into `enum T`;
+   - clips and joins go into a `Reel`;
+   - screens go through the framing calls (never clipped into a fixed box);
+   - the signature moment is redrawn to animate exactly like the real UI. Measure where it sits first: `bash ROOT/scripts/inspect.sh <screenshot> find <its colour>` (or `row`, `column`, `pixel`) gives exact rings, bars and text edges.
+   - **Custom elements** the direction needs go in their own `scenes/*.swift` files.
+3. **Sound:** the direction's `Recipe` + `Section`s via `s.compose`, plus a `s.cue` for every picture event, using the signature sounds.
+4. **Check it builds:** `bash ROOT/scripts/run.sh <film> sheet` (no times: the whole film plus every join). Fix compile errors (ENGINE.md › Gotchas).
 
-## 3. Build
+## 5. Draft, fix, then show the user
 
-1. **Write `scenes/Film.swift`,** replacing the starter. Every time from SCRIPT.md becomes a constant in `enum T`.
-   - Use real screenshots: clip them into rounded "screen" cards (`ctx.addPath(rr(r, 48)); ctx.clip(); drawImage(img, in: r)`).
-   - Move the camera across them, and crop or zoom into the part that matters.
-   - Where something must animate (a tick, a counter, a progress bar, a typed line), redraw that one element to match the screenshot exactly, and lay it over the shot.
-   - Never invent a screen.
-2. **Write the score** in the same file: `s.groove(...)` for the bed, plus a `s.cue(...)` for every on-screen event (stamp, whoosh on morphs, pop on ticks, ding on notifications, thump on the logo), risers into big moments, and `s.muffled` for any "quiet" stretch.
-3. **Run** `bash ROOT/scripts/run.sh <film folder> sheet <times…>` with two or three times per scene. Fix any compile errors (ENGINE.md › Gotchas).
+Work in drafts, and never loop endlessly:
 
-## 4. Critique loop
+1. **Draft 1** is the first complete build: scenes, music and every cue. Review it from the film itself (the steps below); you don't need a video file for that. (`run.sh <film> draft` renders a small, fast MP4 if the user wants an early look.)
+2. **Self-review: one pass, and every check.**
+   - `run.sh <film> check`: every ✗ is a must-fix. Hold the line longer, start it sooner, cut words, or drop the line. A typed line needs its typing time *plus* its reading time. Act on its ⚠ advice too (frame 1, rhythm) unless DIRECTION.md says why not.
+   - `run.sh <film> sheet`: score every category in checklist.md, and fix anything below 8. Look at full-size `stills` of the hook, the signature moment and the end card: is the UI legible, does anything collide, is every corner of the frame doing something or deliberately empty?
+   - **What viewers punish** (RESEARCH.md › community check): UI too small to read, bounce on big things, shots of one length, stock-sounding music, a slow logo moment.
+   - `run.sh <film> audio`, then `bash ROOT/scripts/compare.sh <film>`: if another film is too similar, change the recipe for a reason.
+   - Step through the whole film: `run.sh <film> sheet $(seq 0.5 1 <length>)` (one frame a second). Look for what single stills hide: a scene that empties out, a beat with no movement, a join that jars, a line that appears just as the scene leaves.
+3. **Draft 2.** Fix everything found in one batch, then run `check` and `sheet` again.
+   - If something still fails, allow **one** more fix pass at most.
+   - If it still fails after that, don't keep going: tell the user what's left and why.
+   - Keep a short critique log in SCRIPT.md: what changed and why.
+4. **Render the real file:** `run.sh <film> video`, about 45 s for 30 s.
+5. **Show it and ask** (AskUserQuestion if available). Send the MP4, the 4-line treatment and the critique log, then ask **3–4 targeted questions** about *this* cut. Each needs a recommended option, and "Other" lets the user say anything:
+   - **Pacing:** feels right / slower, fewer lines / faster, more punch.
+   - **Sound:** keep it / more energy / calmer / different instruments.
+   - **Hook:** keep it, or the strongest of the other two hook candidates from plan mode, named.
+   - **Ending:** keep it / a launch-safe ending (for example, no Download badge before the app is live) / add the price.
+6. **Revise once per round of answers**, rerunning `check` and `audio` and `compare`, then show the new cut. After two user rounds, offer to stop or continue; the user decides.
 
-- **Look at `out/sheet.png`.** Score every category in checklist.md, fix anything below 8, re-render, and repeat. At most three rounds.
-- **Run `… audio`** and read the printed levels. Muffled stretches must read quieter than "just before". Effects must line up with the `T` times in `out/beats.json`.
-- **Keep a short log** of what you changed and why, to tell the user.
-
-## 5. Store badges (only if the product is live)
+## 6. Store badges (only if the product is live)
 
 - **App Store live and the user wants a badge:** ask permission to download Apple's official badge (about 11 KB, black, English SVG; URL in rules.md) into `assets/`.
   - Draw it with `drawAppStoreBadge`, still and never animated; emphasis comes from `glowRing`.
-  - If the user insists on animating it, explain Apple's rule once. If they still want it, make that a separate, clearly named variant and keep the compliant version as the main one.
-- **Google Play:** use Google's official badge only if the app is live on Google Play and the user supplies or approves downloading it. Otherwise, at most a plain-text "Soon on Google Play", and only if true.
+  - If the user insists on animating it, explain Apple's rule once. If they still want it, make that a separate, clearly named variant.
+- **Google Play:** its badge only if the app is live there and the user approves the download. Otherwise, at most a plain-text line, and only if true.
 
-## 6. Render and deliver
+## 7. Deliver
 
-1. Run `bash ROOT/scripts/run.sh <film folder> video`. It takes about 45 s for 30 s at 60 fps.
-2. **Hand over the MP4.** Use SendUserFile if it's available; otherwise give the path. Add:
-   - one paragraph on the concept and how it plays;
-   - what the critique loop fixed;
-   - **the claims the user must verify before posting**;
-   - how to change it: edit SCRIPT.md, or tell you, and re-run `video`.
-3. Offer the next useful things: a 15 s cut, another format, a variant ending, or swapping in a licensed music track.
+With every cut you show, include:
+- the treatment in a few lines;
+- what the self-review fixed;
+- the compare result and the `check` verdict;
+- **the claims to verify before posting**;
+- how to change it: edit SCRIPT.md or DIRECTION.md, or just say.
+
+After the user is happy, offer the next useful things:
+- a 15 s cut, or another format (1:1, 16:9);
+- **hook variants** for an A/B test: the same film opened with the other two hook candidates from plan mode;
+- a launch-safe ending (no "Download" before the app is live);
+- an effects-only version (`run.sh <film> video effects`), for posting with a platform sound or a licensed track.

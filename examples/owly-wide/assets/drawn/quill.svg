@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- A scribe's quill, drawn by Claude for this film: one green line weight, no transforms. -->
+  <path d="M168 22 C120 30 82 62 62 108 C56 122 52 136 50 150 C64 142 78 134 92 122 C128 92 152 60 168 22 Z" fill="#E8F3EC" stroke="#0F9B3E" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M168 22 C130 62 96 100 62 140" fill="none" stroke="#0F9B3E" stroke-width="5" stroke-linecap="round"/>
+  <path d="M112 64 L132 70 M96 84 L118 92 M82 104 L102 112" fill="none" stroke="#0F9B3E" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 150 L36 176" fill="none" stroke="#0F9B3E" stroke-width="6" stroke-linecap="round"/>
+  <path d="M24 186 C44 182 64 186 84 182 C104 178 124 184 150 180" fill="none" stroke="#1E2A22" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -23,11 +23,13 @@ func prepare(_ f: Film) {
     film = f
     W = CGFloat(f.width); H = CGFloat(f.height)
     NS = Int(f.duration * Double(SR))
+    registerProjectFonts()
     makeGrain()
 }
 
 func drawFrame(_ t: Double, frame: Int) {
     ctx.textMatrix = .identity
+    fill(CGRect(x: 0, y: 0, width: W, height: H), Col(0x000000))          // never show a reused buffer's old pixels
     film.draw(t)
     drawImage(grain[t >= film.holdFrom ? 0 : frame % grain.count], in: CGRect(x: 0, y: 0, width: W, height: H))
 }
@@ -42,7 +44,17 @@ func renderImage(_ t: Double) -> CGImage {
 }
 
 /// One PNG of small labelled stills — how the critique loop looks at a whole film at once.
+/// The default review set: 12 moments spread over the film, the middle and both edges of every join, and the last frame.
+func reviewTimes() -> [Double] {
+    _ = renderImage(0)                           // a film's reel is created on first use; this registers its joins
+    var ts = (0..<12).map { film.duration * (Double($0) + 0.5) / 12 }
+    for j in reelJoins { ts += [j.at - j.duration * 0.3, j.at, j.at + j.duration * 0.3] }
+    ts.append(film.duration - 1 / Double(film.fps))
+    return ts.map { ($0 * 100).rounded() / 100 }.sorted()
+}
+
 func writeSheet(_ times: [Double], to url: URL) {
+    guard !times.isEmpty else { return }
     let cols = min(6, max(1, times.count))
     let cw = 270, ch = Int(270 * H / W), rows = (times.count + cols - 1) / cols
     let sheetH = rows * (ch + 36)
@@ -64,43 +76,48 @@ func writeSheet(_ times: [Double], to url: URL) {
     writePNG(sheet.makeImage()!, url)
 }
 
-func renderVideo(to dir: URL, audio: URL) async throws -> URL {
+/// Renders the film. `draft` = half size at 30 fps (about 3× faster) for internal review; the file gets a -draft suffix.
+func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = "") async throws -> URL {
+    let scale: CGFloat = draft ? 0.5 : 1
+    let fps = draft ? min(30, film.fps) : film.fps
+    let outW = Int(CGFloat(film.width) * scale) / 2 * 2, outH = Int(CGFloat(film.height) * scale) / 2 * 2
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    let silent = dir.appendingPathComponent(".video-only.mp4"), out = dir.appendingPathComponent("\(film.name).mp4")
+    let silent = dir.appendingPathComponent(".video-only.mp4"), out = dir.appendingPathComponent("\(film.name)\(draft ? "-draft" : "")\(suffix).mp4")
     for u in [silent, out] { try? FileManager.default.removeItem(at: u) }
     let writer = try AVAssetWriter(outputURL: silent, fileType: .mp4)
-    let pixels = Double(film.width * film.height)
+    let pixels = Double(outW * outH)
     let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
-        AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: film.width, AVVideoHeightKey: film.height,
+        AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: outW, AVVideoHeightKey: outH,
         AVVideoCompressionPropertiesKey: [AVVideoAverageBitRateKey: Int(12_000_000 * pixels / (1080 * 1920)),
                                           AVVideoProfileLevelKey: AVVideoProfileLevelH264HighAutoLevel,
-                                          AVVideoExpectedSourceFrameRateKey: film.fps, AVVideoMaxKeyFrameIntervalKey: film.fps],
+                                          AVVideoExpectedSourceFrameRateKey: fps, AVVideoMaxKeyFrameIntervalKey: fps],
         AVVideoColorPropertiesKey: [AVVideoColorPrimariesKey: AVVideoColorPrimaries_ITU_R_709_2,
                                     AVVideoTransferFunctionKey: AVVideoTransferFunction_ITU_R_709_2,
                                     AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2]])
     input.expectsMediaDataInRealTime = false
     let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
         kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-        kCVPixelBufferWidthKey as String: film.width, kCVPixelBufferHeightKey as String: film.height])
+        kCVPixelBufferWidthKey as String: outW, kCVPixelBufferHeightKey as String: outH])
     writer.add(input)
     writer.startWriting()
     writer.startSession(atSourceTime: .zero)
-    let frames = Int((film.duration * Double(film.fps)).rounded())
+    let frames = Int((film.duration * Double(fps)).rounded())
     for f in 0..<frames {
         while !input.isReadyForMoreMediaData { usleep(2000) }
         var pb: CVPixelBuffer?
         CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &pb)
         let buffer = pb!
         CVPixelBufferLockBaseAddress(buffer, [])
-        let c = CGContext(data: CVPixelBufferGetBaseAddress(buffer), width: film.width, height: film.height, bitsPerComponent: 8,
+        let c = CGContext(data: CVPixelBufferGetBaseAddress(buffer), width: outW, height: outH, bitsPerComponent: 8,
                           bytesPerRow: CVPixelBufferGetBytesPerRow(buffer), space: srgb,
                           bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)!
-        c.translateBy(x: 0, y: H); c.scaleBy(x: 1, y: -1)
+        c.translateBy(x: 0, y: CGFloat(outH)); c.scaleBy(x: scale, y: -scale)
         ctx = c
-        drawFrame(Double(f) / Double(film.fps), frame: f)
+        deviceScale = scale
+        drawFrame(Double(f) / Double(fps), frame: f)
         CVPixelBufferUnlockBaseAddress(buffer, [])
-        adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(f), timescale: CMTimeScale(film.fps)))
-        if f % (film.fps * 5) == 0 { print("frame \(f)/\(frames)") }
+        adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(f), timescale: CMTimeScale(fps)))
+        if f % (fps * 5) == 0 { print("frame \(f)/\(frames)") }
     }
     input.markAsFinished()
     await writer.finishWriting()
@@ -110,7 +127,7 @@ func renderVideo(to dir: URL, audio: URL) async throws -> URL {
     let v = AVURLAsset(url: silent), a = AVURLAsset(url: audio)
     let vt = try await v.loadTracks(withMediaType: .video)[0], at = try await a.loadTracks(withMediaType: .audio)[0]
     let aDur = try await a.load(.duration)
-    let full = CMTime(value: CMTimeValue(frames), timescale: CMTimeScale(film.fps))
+    let full = CMTime(value: CMTimeValue(frames), timescale: CMTimeScale(fps))
     try comp.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)!
         .insertTimeRange(CMTimeRange(start: .zero, duration: full), of: vt, at: .zero)
     try comp.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)!
