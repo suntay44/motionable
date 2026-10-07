@@ -18,3 +18,12 @@
 - [ ] <!-- every feature claim above, with where it's proven (code, docs, store page) -->
 
 **Frames.** For each beat, note its settled moment (it goes into `Film(keyframes:)`) and its composition: the focal point, where the words sit, what fills the rest. `run.sh <film> storyboard` renders and audits exactly these frames.
+
+## Narration (only when selected)
+
+Keep exact spoken words in `assets/voice/script.json`; display words may differ in spelling, not meaning. Fill measured seconds after previewing the take, before locking scenes.
+
+| Phrase ID | Spoken words / pronunciation | Source start–end | Film start–end | Caption text |
+|---|---|---|---|---|
+
+Approved manifest: <!-- assets/voice/narration.json, or none -->

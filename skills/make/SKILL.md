@@ -12,6 +12,8 @@ You arrive here with facts about a product (each with a source), the user's answ
 
 Read **`ROOT/PLAN.md`** (plan mode), **`ROOT/ENGINE.md`** (the ingredients), **`ROOT/rules.md`** (hard rules) and **`ROOT/checklist.md`** (critique) before you plan. `ROOT/examples/owly/` shows what finished work looks like. **Never copy its look, sound or structure**: it is one direction among endless ones.
 
+If voiceover was selected, also read **`ROOT/docs/voiceover.md`**. Carry its script, audition, saved-take and mixing steps through this pipeline. With no voice, do not load or set up speech tools.
+
 ## 1. Create the film
 
 - **Where:** films live in the **current folder** (usually the user's studio for hype videos), as `<slug>/`.
@@ -32,15 +34,15 @@ Follow **PLAN.md** from start to finish:
 
 Do not ask the user to pick a style. The direction comes from the evidence.
 
-## 3. One approval
+## 3. Treatment approval
 
-Show the **4-line treatment** (Feel · Sound · Look · Signature moment) and a compact beat grid (time · picture · words · join). Then ask, with **AskUserQuestion** if available (otherwise in chat):
+Show the **4-line treatment** (Feel · Sound · Look · Signature moment) and a compact beat grid (time · picture · words · join). Then ask, with **the available user-input tool** (otherwise in chat):
 1. **The plan:** approve, or change something.
 2. **Illustrations:** "Should I draw illustrations for this film?" Yes, illustrate it / A few accents / No, screenshots and type only. Recommend one with a reason (PLAN.md §5).
    - Drawing them is free: Claude writes SVGs.
    - Only if the session has an image-generation tool connected, add it as an option, and say it may cost money.
 
-Write no scene code before approval. A change here is cheap.
+Write no scene code before approval. A change here is cheap. For narration, include the exact spoken script and delivery in the treatment; follow the conditional audition in `docs/voiceover.md`. Measure and approve the full take before locking scene timing.
 
 ## 4. Build
 
@@ -54,6 +56,7 @@ Write no scene code before approval. A change here is cheap.
    - otherwise the signature moment is redrawn to animate exactly like the real UI, with UI acting (typing, a finger, a state change). Measure where it sits first: `bash ROOT/scripts/inspect.sh <screenshot> find <its colour>` (or `row`, `column`, `pixel`) gives exact rings, bars and text edges.
    - **Custom elements** the direction needs go in their own `scenes/*.swift` files.
 4. **Sound:** the direction's `Recipe` + `Section`s via `s.compose`, plus a `s.cue` for every picture event, using the signature sounds. Tempo phases only if DIRECTION.md chose them (ENGINE.md › Sound).
+   - **Narration, when selected:** attach the approved manifest to `Film(narration:)`. It bypasses musical effects; preview the mixed voice and music. Keep `compare.sh` on the narration-free bed. Export phrase subtitles as described in `docs/voiceover.md`.
 5. **Check it builds:** `bash ROOT/scripts/run.sh <film> sheet` (no times: the whole film plus every join). Fix compile errors (ENGINE.md › Gotchas).
 
 ## 5. Draft, fix, then show the user
@@ -73,9 +76,9 @@ Work in drafts, and never loop endlessly:
    - If it still fails after that, don't keep going: tell the user what's left and why.
    - Keep a short critique log in SCRIPT.md: what changed and why.
 4. **Render the real file:** `run.sh <film> video`, about 45 s for 30 s.
-5. **Show it and ask** (AskUserQuestion if available). Send the MP4, the 4-line treatment and the critique log, then ask **3–4 targeted questions** about *this* cut. Each needs a recommended option, and "Other" lets the user say anything:
+5. **Show it and ask** (the available user-input tool). Send the MP4, the 4-line treatment and the critique log, then ask **3–4 targeted questions** about *this* cut. Each needs a recommended option, and "Other" lets the user say anything:
    - **Pacing:** feels right / slower, fewer lines / faster, more punch.
-   - **Sound:** keep it / more energy / calmer / different instruments.
+   - **Sound:** keep it / more energy / calmer / different instruments. With narration, target the actual issue: delivery, pronunciation or voice/music balance. Reuse the approved take for visual-only changes.
    - **Hook:** keep it, or the strongest of the other two hook candidates from plan mode, named.
    - **Ending:** keep it / a launch-safe ending (for example, no Download badge before the app is live) / add the price.
 6. **Revise once per round of answers**, rerunning `check` and `audio` and `compare`, then show the new cut. After two user rounds, offer to stop or continue; the user decides.

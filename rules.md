@@ -55,6 +55,10 @@ Source: [Google Play badge guidelines](https://partnermarketinghub.withgoogle.co
 33. **Footage stays true.** Speed it, trim it, zoom into it and freeze it, but never change what the app did. Draw on top only to act out what the app really does (a finger on a recorded tap, a tick that syncs), and keep typing slow enough to read (about 2.5× at most).
 34. **Every keyframe composes.** Before anything moves, each beat's settled frame passes `storyboard`: no overlapping or cut-off text, no crop through UI, no accidental emptiness. New text arrives after a see-through join, not during it.
 
+## Narration (when selected)
+
+Use the approved recording and verified spoken claims. Preserve its words, pronunciation and timing; do not silently switch voices, speed it up, or send it to a service. Keep speech outside musical effects. The preparation, review and failure behavior is in [voiceover workflow](docs/voiceover.md).
+
 ## Illustrations
 
 21. **Claude-drawn illustrations** are simple SVGs in `assets/drawn/`, in the brand's colours and line style. Draw them only if the user said yes in plan mode.

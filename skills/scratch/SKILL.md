@@ -17,7 +17,7 @@ If the user mentions a website or a folder that holds the product, offer to swit
 
 ## 1. Ask
 
-Use the **AskUserQuestion** tool if it's available: at most 4 questions per call, clickable options, your recommendation first. Otherwise ask in chat as a short numbered list. If the user passed a product name ($ARGUMENTS), don't ask for it again.
+Use the **available user-input tool** (`AskUserQuestion` or its host equivalent): at most 4 questions per call, clickable options, your recommendation first. Otherwise ask in chat as a short numbered list. If the user passed a product name ($ARGUMENTS), don't ask for it again.
 
 **Round 1** (free text; keep it to one message):
 1. The product name exactly as it should appear, and **what it does in one sentence**.
@@ -32,6 +32,8 @@ Use the **AskUserQuestion** tool if it's available: at most 4 questions per call
    - Feeds (X, LinkedIn, Instagram): 1:1, 15 s.
 6. **Where it's available:** App Store (live) / Google Play (live) / Web / Not released yet. Allow several. Ask about "Coming soon to …" lines separately and only use them if true.
 7. **What should viewers see first?** Offer the features from round 1.
+
+8. **Would you like a voiceover?** Generate a voice (downloads Kokoro on first use; local, no paid account) / Use my recording (no model download) / No voiceover (music and effects only). Ask only if not already answered; carry the answer and any audio paths into make. For generated voice, check `ROOT/scripts/voice.sh status`; if installed, say it uses the installed local engine. Explain English/Apple Silicon support and setup size from status before setup. Full workflow: `ROOT/docs/voiceover.md`, read only if voice is selected.
 
 ## 2. Collect the pictures
 

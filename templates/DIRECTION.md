@@ -55,6 +55,15 @@
 | Illustrations | | |
 | End card | | |
 
+## Voiceover (optional)
+
+- Source: none / local Kokoro / supplied recording
+- Delivery and coverage:
+- Language and pronunciation notes:
+- Script and approved take:
+- Audition/timing approval:
+- Captions: sidecar / scene text / platform / none
+
 ## Recipe
 
 ```swift

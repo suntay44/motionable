@@ -20,11 +20,24 @@ projectDir = URL(fileURLWithPath: args[1]).standardizedFileURL
 let out = projectDir.appendingPathComponent("out")
 prepare(makeFilm())
 let times = args.dropFirst(3).compactMap(Double.init)
+let noVoice = args.dropFirst(3).contains("no-voice")
+let effects = args.dropFirst(3).contains("effects")
+let narration: NarrationTrack?
+do {
+    narration = try (!noVoice && !effects ? film.narration : nil).map {
+        try NarrationTrack.load($0, project: projectDir, filmDuration: film.duration)
+    }
+} catch {
+    fputs("motionable narration: \(error.localizedDescription)\n", stderr)
+    exit(1)
+}
 
 switch args[2] {
 case "audio":
     let s = Score(bpm: film.bpm)
+    s.effectsOnly = effects
     film.score(s)
+    s.narration = narration
     _ = try s.finish(to: out, duration: film.duration)
 case "stills":
     let dir = out.appendingPathComponent("stills")
@@ -44,10 +57,11 @@ case "storyboard":
 case "video", "draft":
     let s = Score(bpm: film.bpm)
     film.score(s)
-    s.effectsOnly = args.dropFirst(3).contains("effects")
+    s.narration = narration
+    s.effectsOnly = effects
     let audio = try s.finish(to: out, duration: film.duration)
     let start = Date()
-    let url = try await renderVideo(to: out, audio: audio, draft: args[2] == "draft", suffix: s.effectsOnly ? "-effects" : "")
+    let url = try await renderVideo(to: out, audio: audio, draft: args[2] == "draft", suffix: s.effectsOnly ? "-effects" : (noVoice ? "-no-voice" : ""))
     print(String(format: "wrote %@ in %.0f s", url.path, Date().timeIntervalSince(start)))
 default:
     print("unknown mode \(args[2])")

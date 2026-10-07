@@ -33,6 +33,7 @@ final class Score {
     var sfxLevel: Float = 1.8
     /// `video effects`: only the sound effects, at the level they have in the full mix (for a platform sound or licensed track on top).
     var effectsOnly = false
+    var narration: NarrationTrack? = nil
     /// Tape stops (the music slows to a halt over the range) and gates (silence over the range), from tempo changes.
     var stops: [(from: Double, to: Double)] = []
     var gates: [(from: Double, to: Double)] = []
@@ -181,6 +182,15 @@ final class Score {
                           hits: hits.sorted { $0.t < $1.t })
         let enc = JSONEncoder(); enc.outputFormatting = [.prettyPrinted]
         try enc.encode(beats).write(to: dir.appendingPathComponent("beats.json"))
+        if let narration, !effectsOnly {
+            let mix = narration.mix(bedLeft: L, bedRight: R)
+            let final = dir.appendingPathComponent("mix.m4a")
+            try VoiceAudio.write(mix.left, mix.right, to: final)
+            try VoiceAudio.write(mix.voiceLeft, mix.voiceRight, to: dir.appendingPathComponent("narration.m4a"))
+            try narration.subtitles().write(to: dir.appendingPathComponent("captions.srt"), atomically: true, encoding: .utf8)
+            print("narration: approved take mixed; music.m4a remains the unducked bed")
+            return final
+        }
         return url
     }
 }

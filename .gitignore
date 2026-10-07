@@ -4,3 +4,6 @@ out/
 .DS_Store
 # Apple badge artwork is never redistributed; users download it from Apple
 **/download-on-the-app-store*.svg
+
+# local helper bytecode
+__pycache__/

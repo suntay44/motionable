@@ -243,3 +243,13 @@ s.compose(recipe, [Section(from: 0, to: 2.3, energy: 1), Section(from: 2.3, to: 
 - **Timing:** keep every time on the beat grid, or picture and music drift.
 - **The final hold:** from `holdFrom` to the end, nothing may move.
 - **Render time:** about 1.5–4 s per second of film. Per-frame looks (`bloomed`, `postProcess`, big shadows) cost the most, so use them where they matter.
+
+## Optional narration
+
+Prepare/import and approve a take with `scripts/voice.sh` ([workflow](docs/voiceover.md)), then add
+`narration: "assets/voice/narration.json"` to the end of `Film(...)`. Omit it for the original audio path.
+The renderer validates approval, script/audio hashes and timing, resamples mono/stereo audio to 48 kHz,
+ducks the mastered bed and adds speech after musical effects. It never loads Kokoro or downloads files.
+`audio`/`video`/`draft` produce/use `out/mix.m4a`; `out/music.m4a` stays the unducked bed for compare.
+`video no-voice` exports a `-no-voice.mp4`; `video effects` remains effects only. `out/narration.m4a` is
+the voice stem; `out/captions.srt` contains phrase subtitles. Burned-in captions use ordinary scene text.

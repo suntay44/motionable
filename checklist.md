@@ -20,3 +20,5 @@ Also check:
 - Mid-transition stills: shapes and text shouldn't look broken or collide in an ugly way. Briefly odd is fine; a mess is not.
 - The final hold frame: is it a good thumbnail on its own?
 - The longest line at the auto-fit size: is it still big enough?
+
+**If narrated:** names and claims correct; no missing words or awkward joins; speech fits the cut; voice intelligible over music; caption phrases match the recording; approved manifest current. Preview dry and mixed takes. Do not claim listening validation from levels alone.

@@ -39,13 +39,15 @@ If no URL was given, ask for one. If the user would rather describe the product,
 
 Post a short summary: **name, pitch, top features, colours, price, platforms**, plus a list of the images found with what each shows and its size.
 
-Then ask, using **AskUserQuestion** if available (otherwise a numbered chat list), only for what's missing or uncertain:
+Then ask, using **the available user-input tool** (otherwise a numbered chat list), only for what's missing or uncertain:
 - **Where will people watch it?** (sets the format and length; "Other" takes any size or length):
   - Reels, TikTok, Shorts: 9:16, 30 s, plus a 15 s cut (recommended);
   - YouTube, a website, a launch post: 16:9, 20–30 s;
   - Feeds (X, LinkedIn, Instagram): 1:1, 15 s.
 - **What viewers should see first** (offer the top features).
 - Confirm **platforms and price line**, and any "coming soon" claims. Only use those if true.
+
+- **Would you like a voiceover?** Generate a voice (downloads Kokoro on first use; local, no paid account) / Use my recording (no model download) / No voiceover (music and effects only). Ask only if not already answered; carry the answer and any audio paths into make. For generated voice, check `ROOT/scripts/voice.sh status`; if installed, say it uses the installed local engine. Explain English/Apple Silicon support and setup size from status before setup. Full workflow: `ROOT/docs/voiceover.md`, read only if voice is selected.
 
 ## 3. Collect the pictures
 

@@ -146,3 +146,12 @@ Then show the user a **4-line treatment** and the compact grid, for one approval
 > **Sound:** 104 BPM D dorian funk, slap bass, brass stabs, cowbell; chops on the cuts, a ka-ching when costs land
 > **Look:** Ponda red and cream; condensed caps popping word by word, prices in a bigger yellow; knife-slice and whip transitions; screens fly in, stickers pop; a lifted price card
 > **Signature moment:** servings roll 4 → 40 while the total spins up like a slot machine
+
+## Optional voiceover
+
+The initial briefing offers generated voice (optional first-use Kokoro download), a supplied recording,
+or music/effects only. Read [the voiceover workflow](docs/voiceover.md) only when selected. Include spoken
+copy and delivery in the treatment, audition a new generated performance, then measure the approved
+take before locking scene times. Existing music-only films keep the same approval/render flow.
+
+[Design and scenario review](docs/voiceover-plan.md) records scope, tradeoffs and remaining work.

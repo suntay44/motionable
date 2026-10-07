@@ -8,7 +8,7 @@
 **Hype videos for your product, drawn in code on your Mac.**
 A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders a ready-to-post MP4.
 
-Free · open source · macOS only · nothing to install
+Free · open source · macOS only · no extra setup for music-only films
 
 <br />
 
@@ -110,6 +110,7 @@ Then it renders the MP4 and asks 3–4 short questions about pacing, sound, hook
 | Posting with a trending sound | `run.sh <film> video effects` | The sound effects only, so the platform's sound goes on top |
 | An app with no screenshots | `/motionable:project …` with the app in the Simulator | Claude captures each screen while you open it |
 | A screen recording of your best feature | Drop it in with any command | The film plays the real app working: zoomed, sped up and freeze-framed |
+| Optional voiceover | Choose during the initial questions | Local Kokoro after one-time setup, or your own recording; preview before approval |
 
 ## Example runs
 
@@ -198,7 +199,7 @@ Yes. The plugin is MIT-licensed, with no render credits and no subscriptions. Th
 No. It renders with Apple's built-in frameworks (Core Graphics, Core Text, AVFoundation) through Swift, so it needs a Mac.
 
 **Do I need After Effects, Remotion or ffmpeg?**
-No. Everything, the music included, is made by the Swift engine that ships with the plugin.
+No. The Swift engine draws the film and composes the music. Optional generated narration uses a separately downloaded local Kokoro helper.
 
 **Can I use the video as an App Store preview?**
 No. App Store previews must be footage captured from the app itself (App Review Guideline 2.3.4). Use motionable videos for social posts, ads, websites and launch posts. To make a preview, record the app instead, for example with `xcrun simctl io booted recordVideo`.
@@ -252,3 +253,12 @@ for s in scratch website project make; do ln -s ~/.motionable/skills/$s ~/.agent
 ## Licence
 
 MIT for the code and docs. The app screenshots, icons and mascots in `examples/*/assets/` belong to their apps and aren't covered by MIT ([details](examples/README.md)). Apple's badge artwork is never bundled; motionable asks before downloading it from Apple.
+
+## Optional local voiceover
+
+The initial questions now offer a generated voice, your own recording, or music/effects only.
+Generated speech uses Kokoro `af_heart` locally after optional setup (about 153 MB of downloads;
+Apple Silicon, US English). No paid account or transcription model. Supplied recordings do not need
+Kokoro. Approved audio stays with the film and renders offline. The first voice is fixed; preview it
+before approving a full take. See [voiceover workflow](docs/voiceover.md) for setup, script, import,
+approval, captions and revisions. Cloud voices and automatic transcription are not integrated.

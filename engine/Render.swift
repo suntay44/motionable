@@ -19,6 +19,8 @@ struct Film {
     var keyframes: [Double] = []
     /// Tempo phases (Tempo.swift): changes and ramps of tempo that music and picture both follow. Nil: one tempo, `bpm`.
     var tempo: TempoMap? = nil
+    /// Approved local narration manifest; nil keeps the original music-only path.
+    var narration: String? = nil
 }
 
 var film: Film!
