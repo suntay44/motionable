@@ -45,14 +45,16 @@ Write no scene code before approval. A change here is cheap.
 ## 4. Build
 
 1. **Illustrations** (if yes): write the SVGs into `assets/drawn/` in the brand's colours and one line weight (ENGINE.md › Drawn illustrations). Look at each one rendered on a sheet, and redraw anything clumsy.
-2. **`scenes/Film.swift`:** replace the skeleton completely. Every value comes from DIRECTION.md and SCRIPT.md:
+2. **Storyboard first.** Lay every scene out at its settled state before any motion: every element at its final place. Set `keyframes:` to each beat's settled moment (SCRIPT.md), run `bash ROOT/scripts/run.sh <film> storyboard`, fix every ✗ (overlaps, cut-off text, crops through UI, contrast, safe zones), and judge each keyframe as a still: one focal point, a shared margin, nothing empty or touching an edge by accident (PLAN.md › 5b). Then animate.
+3. **`scenes/Film.swift`:** replace the skeleton completely. Every value comes from DIRECTION.md and SCRIPT.md:
    - the times go into `enum T`;
    - clips and joins go into a `Reel`;
    - screens go through the framing calls (never clipped into a fixed box);
-   - the signature moment is redrawn to animate exactly like the real UI. Measure where it sits first: `bash ROOT/scripts/inspect.sh <screenshot> find <its colour>` (or `row`, `column`, `pixel`) gives exact rings, bars and text edges.
+   - **if there's a recording of the signature moment, use it** (ENGINE.md › Footage): trim it into `assets/` with `footage.sh … trim`, map film time to it with `Playback` (through waits fast, typing at most about 2.5×, freezing on results), move a `Zoom` camera to where its timeline says the change happens, and put fingers on its taps with `TouchPath`. Sounds go on recorded events through `play.filmTime(of:)`;
+   - otherwise the signature moment is redrawn to animate exactly like the real UI, with UI acting (typing, a finger, a state change). Measure where it sits first: `bash ROOT/scripts/inspect.sh <screenshot> find <its colour>` (or `row`, `column`, `pixel`) gives exact rings, bars and text edges.
    - **Custom elements** the direction needs go in their own `scenes/*.swift` files.
-3. **Sound:** the direction's `Recipe` + `Section`s via `s.compose`, plus a `s.cue` for every picture event, using the signature sounds.
-4. **Check it builds:** `bash ROOT/scripts/run.sh <film> sheet` (no times: the whole film plus every join). Fix compile errors (ENGINE.md › Gotchas).
+4. **Sound:** the direction's `Recipe` + `Section`s via `s.compose`, plus a `s.cue` for every picture event, using the signature sounds. Tempo phases only if DIRECTION.md chose them (ENGINE.md › Sound).
+5. **Check it builds:** `bash ROOT/scripts/run.sh <film> sheet` (no times: the whole film plus every join). Fix compile errors (ENGINE.md › Gotchas).
 
 ## 5. Draft, fix, then show the user
 
@@ -60,7 +62,8 @@ Work in drafts, and never loop endlessly:
 
 1. **Draft 1** is the first complete build: scenes, music and every cue. Review it from the film itself (the steps below); you don't need a video file for that. (`run.sh <film> draft` renders a small, fast MP4 if the user wants an early look.)
 2. **Self-review: one pass, and every check.**
-   - `run.sh <film> check`: every ✗ is a must-fix. Hold the line longer, start it sooner, cut words, or drop the line. A typed line needs its typing time *plus* its reading time. Act on its ⚠ advice too (frame 1, rhythm) unless DIRECTION.md says why not.
+   - `run.sh <film> check`: every ✗ is a must-fix. Hold the line longer, start it sooner, cut words, or drop the line. A typed line needs its typing time *plus* its reading time. Every layout ✗ too: overlapping text, cut-off text, a crop through UI. Act on its ⚠ advice (frame 1, rhythm, empty stretches, text crossing in a join, covered text, a camera cropping UI) unless DIRECTION.md says why not.
+   - `run.sh <film> storyboard` again: every keyframe ✓.
    - `run.sh <film> sheet`: score every category in checklist.md, and fix anything below 8. Look at full-size `stills` of the hook, the signature moment and the end card: is the UI legible, does anything collide, is every corner of the frame doing something or deliberately empty?
    - **What viewers punish** (RESEARCH.md › community check): UI too small to read, bounce on big things, shots of one length, stock-sounding music, a slow logo moment.
    - `run.sh <film> audio`, then `bash ROOT/scripts/compare.sh <film>`: if another film is too similar, change the recipe for a reason.

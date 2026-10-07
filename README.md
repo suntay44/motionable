@@ -49,12 +49,12 @@ Three films for three real apps, each made from its repo with `/motionable:proje
 </tr>
 <tr>
 <td align="center"><b>Ponda the Chef</b><br />9:16 · 30 s · Reels, TikTok, Shorts<br />punchy pop, 122 BPM</td>
-<td align="center"><b>Owly the Scribe</b><br />16:9 · 23 s · YouTube, a website<br />piano and kalimba, 88 BPM</td>
+<td align="center"><b>Owly the Scribe</b><br />16:9 · 25 s · YouTube, a website<br />real screen recordings, piano and kalimba</td>
 <td align="center"><b>Bonnie</b><br />1:1 · 15 s · feeds<br />a 3/4 music-box lullaby, 72 BPM</td>
 </tr>
 </table>
 
-**With sound:** [Ponda the Chef](https://github.com/suntay44/motionable/releases/download/v0.3.0/ponda-the-chef.mp4) · [Owly the Scribe](https://github.com/suntay44/motionable/releases/download/v0.3.0/owly-wide.mp4) · [Bonnie](https://github.com/suntay44/motionable/releases/download/v0.3.0/bonnie.mp4). Each film's plan and code are in [examples/](examples).
+**With sound:** [Ponda the Chef](https://github.com/suntay44/motionable/releases/latest/download/ponda-the-chef.mp4) · [Owly the Scribe](https://github.com/suntay44/motionable/releases/latest/download/owly-wide.mp4) · [Bonnie](https://github.com/suntay44/motionable/releases/latest/download/bonnie.mp4). Each film's plan and code are in [examples/](examples).
 
 ## Install
 
@@ -109,6 +109,7 @@ Then it renders the MP4 and asks 3–4 short questions about pacing, sound, hook
 | A live app running ads | After the first film: "make hook variants" | The same film with each of the plan's three hooks, for an A/B test |
 | Posting with a trending sound | `run.sh <film> video effects` | The sound effects only, so the platform's sound goes on top |
 | An app with no screenshots | `/motionable:project …` with the app in the Simulator | Claude captures each screen while you open it |
+| A screen recording of your best feature | Drop it in with any command | The film plays the real app working: zoomed, sped up and freeze-framed |
 
 ## Example runs
 
@@ -164,9 +165,14 @@ the hook is too slow; open on the widget instead
 ```
 
 - **Your real product:** your screenshots, colours and logo, and no invented features. Claims to double-check are listed for you.
+- **The app working:** give it a screen recording (from the Simulator, QuickTime or your phone) and it plays the real app: speeding through waits, zooming in where things happen, freezing on results, with a finger on every tap. No recording? It acts out the app on screenshots: typing with a caret, taps, screens changing.
 - **Directed, not templated:** no style presets. Plan mode sets about 16 dials from your product's evidence (tempo, key, drums, instruments, type, framing, transitions…). A new film must differ from every other film in your studio, and a sound comparison flags any track that would feel the same.
+- **Type with character:** a film can mix faces, weights, italics, sizes and colours word by word, like a serif italic for the feeling phrase, bigger numbers, or a key word in the brand colour. Each accent has a job, and every line's contrast is measured.
+- **Motion for everything:** text has 13 entrances. Images, screens, cards and stickers can pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip or spin in and out. Each film picks one motion vocabulary to match its feel.
 - **Original music:** composed in code for each film, in any tempo, key, groove or meter (even a 3/4 lullaby), and synced to every cut. There's nothing to license.
-- **Readable by design:** every line is held for its reading time, key text stays clear of the Reels, TikTok and Shorts buttons, and screens are never sliced.
+- **Readable by design:** every line is held for its reading time and keeps 3:1 contrast with what's behind it. Key text stays clear of the Reels, TikTok and Shorts buttons, and screens are never sliced.
+- **Storyboarded, then audited:** every beat is laid out as a still and checked before anything moves. A layout audit then catches what a careful eye would: overlapping or cut-off text, crops through the UI, text covered by a finger or a card, empty stretches and uneven margins.
+- **Music with phases:** when the story wants it, the groove can drop to half-time under the problem and snap back at the reveal, change tempo through a tape stop or a beat of silence, or slow into the ending. The picture follows the same beat.
 - **Store-safe:** Apple's badge is never animated, and Google Play is shown only if you're on it.
 - **Fast:** a 30 s, 60 fps 1080p video renders in about 20–45 s.
 
@@ -201,7 +207,10 @@ No. App Store previews must be footage captured from the app itself (App Review 
 It's composed in code for each film, so there's nothing to license. If you want a trending sound, render the effects-only version and add the sound in the app.
 
 **Will my videos all look the same?**
-No. There are no templates. Each film is directed from its product's own evidence, and it's checked against the other films in your studio.
+No. There are no templates. Each film is directed from its product's own evidence (its sound, type mix, colours and motion), and it's checked against the other films in your studio.
+
+**Can I use my brand's fonts and colours?**
+Yes. Drop the font files into the film's `assets/fonts/` (if their licence allows it), or let it pick a matching macOS face. Colours come from your logo, screenshots or site, and accents are checked for contrast.
 
 **Does it change my project?**
 No. `/motionable:project` only reads the folder you point it at, and the film goes into your studio folder.
@@ -236,7 +245,8 @@ for s in scratch website project make; do ln -s ~/.motionable/skills/$s ~/.agent
 - [rules.md](rules.md): what every film follows.
 - [checklist.md](checklist.md): the self-critique.
 - [RESEARCH.md](RESEARCH.md): the evidence.
-- `bash scripts/test.sh`: renders every element, entrance, look and transition once, then checks every example film.
+- `bash scripts/test.sh`: runs focused engine and footage regressions, renders every element, entrance, look and transition once, verifies the layout audit, then checks every example film.
+- `bash scripts/regression.sh`: checks playback timing, sparse and rotated recordings, tempo maps, font caching and cut entrances with temporary fixtures.
 - `bash scripts/inspect.sh <screenshot> find <colour>`: measures UI for exact redraws.
 
 ## Licence

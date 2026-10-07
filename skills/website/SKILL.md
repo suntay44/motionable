@@ -52,6 +52,8 @@ Then ask, using **AskUserQuestion** if available (otherwise a numbered chat list
 - **Ask once** for permission to download the useful images into a `<slug>-downloads/` folder in the current folder, showing the file list, e.g. "logo.png, 4 screenshots, about 2 MB, from <site>". Then fetch them with `curl -sL -o`. Prefer the largest version of each (check `srcset`).
 - **Look at each image** with the Read tool. Keep product screenshots, the logo and the icon. Skip stock photos, illustrations of people, and decorative blobs.
 
+Also look for **product videos** on the page (`<video>` sources, demo clips) and ask before downloading one; a screen recording of the product working is the strongest material there is. Read it with `bash ROOT/scripts/footage.sh <video>`.
+
 **Image check:** you need **a logo + at least 3 product screenshots** that show different screens. Marketing pages often have only one hero shot.
 - If you're short, say what's missing and ask the user to drop files in, e.g. "The site has 1 product screenshot. Drag 2–4 more into this chat, or give me their paths: your main screen, your best feature, and one more."
 - If they can't, offer a type-and-shapes film built from the site's colours and words, and say plainly that it will show less of the product.

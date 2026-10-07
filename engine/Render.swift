@@ -15,11 +15,16 @@ struct Film {
     var draw: (_ t: Double) -> Void
     /// Fills the score: instruments and sound effects on the film's times.
     var score: (_ s: Score) -> Void
+    /// The moment each beat is fully laid out (from SCRIPT.md), for `storyboard`. Empty: the end of each scene.
+    var keyframes: [Double] = []
+    /// Tempo phases (Tempo.swift): changes and ramps of tempo that music and picture both follow. Nil: one tempo, `bpm`.
+    var tempo: TempoMap? = nil
 }
 
 var film: Film!
 
 func prepare(_ f: Film) {
+    tempoMap = f.tempo ?? TempoMap(f.bpm)
     film = f
     W = CGFloat(f.width); H = CGFloat(f.height)
     NS = Int(f.duration * Double(SR))

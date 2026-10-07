@@ -3,7 +3,7 @@
 import AppKit
 
 func makeFilm() -> Film {
-    Film(name: "gallery", width: 1080, height: 1920, fps: 30, duration: 7, bpm: 120, holdFrom: 7, draw: frame, score: { _ in })
+    Film(name: "gallery", width: 1080, height: 1920, fps: 30, duration: 9, bpm: 120, holdFrom: 9, draw: frame, score: { _ in })
 }
 let paper = Col(0xF4F1EA), ink = Col(0x1D1D1F), red = Col(0xD8342C), blue = Col(0x2F6FEB), green = Col(0x1E9E4A)
 let head = Face.system(.heavy), mono = Face.named("Menlo-Bold")
@@ -121,6 +121,71 @@ func joinsPage(_ t: Double) {
     }
 }
 
+/// Page 7: mixed type: faces, weights, italics, sizes, colours, a highlighter and an underline inside one line.
+func typeMixPage(_ t: Double) {
+    fill(fullCanvas(), paper)
+    let rows: [Kinetic] = [
+        Kinetic(lines: ["Cooking for *40?*"], face: head, size: 104, colour: ink, x: 60, y: 160, from: 0, enter: .none, exit: .none,
+                accent: TextStyle(colour: red, scale: 1.25)),
+        Kinetic(lines: ["Make a list for *your son.*"], face: .system(.bold, .serif), size: 76, colour: ink, x: 60, y: 330, from: 0,
+                enter: .none, exit: .none, maxWidth: nil, accent: TextStyle(face: Face.system(.regular, .serif).italic, colour: green)),
+        Kinetic(lines: ["One answer *each morning.*"], face: .system(.heavy, .rounded), size: 74, colour: Col(0xFFFFFF), x: 60, y: 500, from: 0,
+                enter: .none, exit: .none, maxWidth: nil, accent: TextStyle(colour: Col(0xFFE9A8))),
+        Kinetic(lines: ["{m:Scale} any recipe."], face: .named("AvenirNext-Heavy"), size: 84, colour: ink, x: 60, y: 680, from: 0,
+                enter: .none, exit: .none, styles: ["m": TextStyle(mark: Col(0xFFD84D))]),
+        Kinetic(lines: ["Know what each plate {u:costs.}"], face: .named("AvenirNext-Heavy"), size: 70, colour: ink, x: 60, y: 840, from: 0,
+                enter: .none, exit: .none, maxWidth: nil, styles: ["u": TextStyle(colour: red, underline: red)]),
+        Kinetic(lines: ["*Fast.* Friendly. {thin:Free.}"], face: .system(.medium), size: 80, colour: ink, x: 60, y: 1010, from: 0,
+                enter: .none, exit: .none, maxWidth: nil, accent: TextStyle(face: .system(.black)), styles: ["thin": TextStyle(face: .system(.ultraLight), colour: blue)]),
+        Kinetic(lines: ["Rounded, *slanted*"], face: .system(.heavy, .rounded), size: 84, colour: ink, x: 60, y: 1180, from: 0,
+                enter: .none, exit: .none, accent: TextStyle(face: Face.system(.heavy, .rounded).italic, colour: green)),
+        Kinetic(lines: ["The *real* thing."], face: .named("Futura-Bold"), size: 96, colour: ink, x: 60, y: 1350, from: 0,
+                enter: .none, exit: .none, accent: TextStyle(face: Face.named("Didot").italic, colour: red, scale: 1.2)),
+        Kinetic(lines: ["Words pop in", "*one by one*"], face: head, size: 80, colour: ink, x: 60, y: 1560, from: 6.0, enter: .pop, exit: .none,
+                stagger: 0.08, accent: TextStyle(colour: blue)),
+    ]
+    let dark = CGRect(x: 30, y: 420, width: 1020, height: 120)
+    fill(rr(dark, 24), Col(0x1D2C74))                         // row 3 sits on night blue, as in Bonnie
+    for k in rows { k.draw(t) }
+}
+
+/// Page 8: every `show` entrance, caught halfway in.
+func motionsPage(_ t: Double) {
+    fill(fullCanvas(), ink)
+    let motions: [(String, Appear)] = [("cut", .cut), ("fade", .fade), ("pop", .pop), ("zoom", .zoom), ("rise", .rise), ("drop", .drop),
+                                       ("slide left", .slide(.left)), ("fly right", .fly(.right)), ("wipe left", .wipe(.left)), ("iris", .iris),
+                                       ("blur", .blur), ("flip", .flip), ("spin", .spin)]
+    for (i, m) in motions.enumerated() {
+        let cell = CGRect(x: 40 + CGFloat(i % 3) * 340, y: 40 + CGFloat(i / 3) * 370, width: 320, height: 300)
+        unlogged { text(m.0, 28, Face.system(.bold), Col(0xFFFFFF, 0.6), cell.minX, cell.maxY + 36) }
+        stroke(rr(cell, 30), Col(0xFFFFFF, 0.15), 2)
+        let card = cell.insetBy(dx: 50, dy: 50)
+        show(card, t: t, from: 7.5 - 0.225, enter: m.1) {      // halfway through a 0.45 s entrance at 7.5 s
+            fill(rr(card, 24), red)
+            icon(.star, at: CGPoint(x: card.midX, y: card.midY), size: 90, colour: Col(0xFFFFFF), weight: 2.6)
+        }
+    }
+}
+
+/// Page 9: UI acting: typing into a field, a finger moving and tapping, and each state change caught halfway.
+func actingPage(_ t: Double) {
+    fill(fullCanvas(), paper)
+    let field = CGRect(x: 80, y: 120, width: 920, height: 120)
+    fill(rr(field, 24), Col(0xFFFFFF)); stroke(rr(field, 24), Col(0x000000, 0.1), 2)
+    typeIn("Pack gym clothes", t: t, from: 8.0, cps: 14, at: CGPoint(x: 120, y: 198), size: 52, colour: ink)
+    let finger = TouchPath([(8.0, CGPoint(x: 200, y: 420)), (8.3, CGPoint(x: 540, y: 380)), (8.5, CGPoint(x: 820, y: 420))], taps: [8.5])
+    finger.draw(t); finger.draw(t + 0.02, colour: blue, size: 50)              // a second one just behind, to show the path
+    TouchPath([(8.0, CGPoint(x: 300, y: 560)), (8.5, CGPoint(x: 700, y: 560))], taps: [8.5], style: .arrow).draw(t)
+    let styles: [(String, StateChange)] = [("crossfade", .crossfade), ("push", .push(.right)), ("reveal", .reveal(CGPoint(x: 130, y: 1120)))]
+    for (i, st) in styles.enumerated() {
+        let r = CGRect(x: 60 + CGFloat(i) * 330, y: 760, width: 300, height: 620)
+        changeState(t: t, at: 8.5 - 0.175, length: 0.35, style: st.1, in: CGRect(x: r.minX, y: r.minY, width: r.width, height: r.height), radius: 30,
+                    before: { fill(rr(r, 30), red); unlogged { text("A", 160, head, Col(0xFFFFFF), r.midX, r.midY + 60, align: 0.5) } },
+                    after: { fill(rr(r, 30), blue); unlogged { text("B", 160, head, Col(0xFFFFFF), r.midX, r.midY + 60, align: 0.5) } })
+        unlogged { text(st.0, 30, Face.system(.bold), ink, r.minX, r.maxY + 44) }
+    }
+}
+
 func frame(_ t: Double) {
     switch Int(t) {
     case 0: elementsA(t)
@@ -128,6 +193,9 @@ func frame(_ t: Double) {
     case 2: backgrounds(t)
     case 3: typePage(t)
     case 4: looksPage(t)
-    default: joinsPage(t)
+    case 5: joinsPage(t)
+    case 6: typeMixPage(t)
+    case 7: motionsPage(t)
+    default: actingPage(t)
     }
 }

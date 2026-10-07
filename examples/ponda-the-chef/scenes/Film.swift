@@ -4,7 +4,7 @@ import AppKit
 
 func makeFilm() -> Film {
     Film(name: "ponda-the-chef", width: 1080, height: 1920, fps: 60, duration: 30, bpm: T.bpm,
-         holdFrom: T.hold, draw: frame, score: score)
+         holdFrom: T.hold, draw: frame, score: score, keyframes: [2.6, 7.6, 13.2, 18.8, 24.0, 29.5])
 }
 
 // MARK: - Timeline (122 BPM)
@@ -29,6 +29,8 @@ let red = Col(0xB4232D), redDeep = Col(0x9A1D26), blush = Col(0xFDEBEC), offWhit
 let ink = Col(0x1C1C1E), cream = Col(0xFFF6EE)
 let head = Face.named("AvenirNext-Heavy"), body = Face.named("AvenirNext-DemiBold")
 let uiRegular = Face.system(.regular), uiBold = Face.system(.bold)
+// Type mix: one geometric face; numbers are the hero (bigger), and each benefit's key word takes Ponda red.
+let bigNumber = TextStyle(scale: 1.22), redWord = TextStyle(colour: red)
 
 let pondaClosed = loadImage("assets/mascot-pose-1.png"), pondaOpen = loadImage("assets/mascot-pose-2.png")
 let pondaHappy = loadImage("assets/mascot-pose-3.png"), appIcon = loadImage("assets/logo-icon.png")
@@ -52,8 +54,8 @@ func hookScene(_ t: Double) {
     fill(fullCanvas(), red)
     dotGrid(spacing: 46, radius: 3, colour: Col(0xFFFFFF, 0.07), t: t, drift: 14)
     // Both lines have landed before 0, so frame 1 already reads "Cooking for 40?" (the film opens on the impact).
-    Kinetic(lines: ["Cooking", "for 40?"], face: head, size: 190, colour: cream, x: 72, y: 470,
-            from: -0.3, enter: .stamp, exit: .none, stagger: 0.12).draw(t)
+    Kinetic(lines: ["Cooking", "for *40?*"], face: head, size: 190, colour: cream, x: 72, y: 470,
+            from: -0.3, enter: .stamp, exit: .none, lineHeight: 1.12, stagger: 0.12, accent: bigNumber).draw(t)
     // 40 place settings: 4 at once, then the rest on the 16ths.
     let shown = t < 0.3 ? 4 : min(40, 4 + Int((t - 0.3) / (T.beat / 4)) * 2)
     for i in 0..<shown {
@@ -75,8 +77,8 @@ let scaleRegion = CGRect(x: 0, y: 640, width: 1206, height: 1180)
 func scaleScene(_ t: Double) {
     fill(fullCanvas(), offWhite)
     blobs(count: 3, colours: [blush, Col(0xF6D6D9)], t: t, seed: 4, alpha: 0.8, scale: 1.1)
-    Kinetic(lines: ["Scale any recipe."], face: head, size: 112, colour: ink, x: 72, y: 400,
-            from: T.toScale + 0.1, enter: .rise).draw(t)
+    Kinetic(lines: ["Scale *any* recipe."], face: head, size: 112, colour: ink, x: 72, y: 400,
+            from: T.toScale + 0.1, enter: .rise, accent: redWord).draw(t)
     let e = outCubic(prog(t, T.toScale, T.toScale + 0.5))
     let box = CGRect(x: 60, y: 500 + 120 * CGFloat(1 - e), width: 960, height: 960 * 1180 / 1206)
     let dest = drawScreen(shotScaling, region: scaleRegion, in: box, radius: 44, snap: false)
@@ -90,7 +92,8 @@ func scaleScene(_ t: Double) {
     fill(area(100, 1150, 760, 212), Col(0xFFFFFF))
     let l = pt(110, 1198); text("\(pax) PAX", 38 * k, uiBold, red, l.x, l.y, kern: 5.5 * k)
     let tot = pt(110, 1342); text(String(format: "$%.2f", Double(pax) * 3.10), 107 * k, uiBold, Col(0x000000), tot.x, tot.y)
-    tapRipple(at: pt(1050, 920), at: T.tapServings, t: t, colour: red)
+    // UI acting: a finger comes in and taps the servings stepper, as a cook would.
+    TouchPath([(T.tapServings - 0.45, pt(930, 1090)), (T.tapServings, pt(985, 925))], taps: [T.tapServings]).draw(t, colour: ink, size: 70)  // beside the number, so the roll stays visible
     sparkles(around: CGRect(x: tot.x, y: tot.y - 90 * k, width: 430 * k, height: 110 * k), t: t, from: T.roll.1, count: 7, colour: red, seed: 4)
 }
 
@@ -100,9 +103,11 @@ let costTarget = CGRect(x: 330, y: 700, width: 640, height: 240)
 func costScene(_ t: Double) {
     fill(fullCanvas(), blush)
     blobs(count: 3, colours: [Col(0xF8D9DC), offWhite], t: t, seed: 12, alpha: 0.7, scale: 1.1)
-    Kinetic(lines: ["Know what each", "plate costs."], face: head, size: 112, colour: ink, x: 72, y: 400,
-            from: T.toCost + 0.1, enter: .rise).draw(t)
-    let screen = drawScreen(shotDetail, in: CGRect(x: 60, y: 600, width: 520, height: 1240), radius: 40)
+    Kinetic(lines: ["Know what each", "*plate* costs."], face: head, size: 112, colour: ink, x: 72, y: 400,
+            from: T.toCost + 0.1, enter: .rise, accent: redWord).draw(t)
+    // Motion vocabulary: screens slide in from the side they sit on; stickers and chips pop.
+    let box = CGRect(x: 60, y: 600, width: 520, height: 1240), screen = fitted(shotDetail.bounds, in: box)
+    show(screen, t: t, from: T.toCost - 0.1, enter: .slide(.left), length: 0.5) { drawScreen(shotDetail, in: box, radius: 40) }
     let lp = prog(t, T.callout, T.callout + 0.5)
     callout(shotDetail, region: costRegion, screenRect: screen, to: costTarget, p: lp, plate: Col(0xFFFFFF))
     if lp >= 1 {
@@ -119,8 +124,8 @@ let cartMove = ScreenMove(shotCart, [(T.toList + 0.3, CGRect(x: 0, y: 280, width
                                      (T.listTotal, CGRect(x: 0, y: 1000, width: 1206, height: 1150))])
 func listScene(_ t: Double) {
     fill(fullCanvas(), offWhite)
-    Kinetic(lines: ["One list", "for the week."], face: head, size: 112, colour: ink, x: 72, y: 400,
-            from: T.toList + 0.1, enter: .rise).draw(t)
+    Kinetic(lines: ["One list", "for *the week.*"], face: head, size: 112, colour: ink, x: 72, y: 400,
+            from: T.toList + 0.1, enter: .rise, accent: redWord).draw(t)
     let region = cartMove.region(t)
     let dest = cartMove.draw(t, in: CGRect(x: 90, y: 640, width: 900, height: 1180), radius: 40)
     let total = canvasPoint(CGPoint(x: 1010, y: 2095), region: region, drawnIn: dest)
@@ -152,15 +157,12 @@ func endScene(_ t: Double) {
     Kinetic(lines: ["Ponda the Chef"], face: head, size: 104, colour: ink, x: 540, y: 820, from: T.toEnd + 0.4, enter: .rise, exit: .none, align: 0.5).draw(t)
     Kinetic(lines: ["Scale any recipe. Know what it costs."], face: body, size: 44, colour: ink.alpha(0.8), x: 540, y: 900,
             from: T.toEnd + 0.7, enter: .fade, exit: .none, align: 0.5).draw(t)
-    let cp = outCubic(prog(t, T.toEnd + 1.0, T.toEnd + 1.4))
-    if cp > 0 {
-        let label = "Coming soon to the App Store"
-        let w = textWidth(label, 40, head) + 90
-        let pill = CGRect(x: 540 - w / 2, y: 975 + 30 * CGFloat(1 - cp), width: w, height: 86)
-        ctx.saveGState(); ctx.setAlpha(CGFloat(cp))
+    let label = "Coming soon to the App Store"
+    let pw = textWidth(label, 40, head) + 90
+    let pill = CGRect(x: 540 - pw / 2, y: 975, width: pw, height: 86)
+    show(pill, t: t, from: T.toEnd + 1.0, enter: .pop, length: 0.4) {
         fill(rr(pill, 43), red)
         text(label, 40, head, cream, 540, pill.minY + 57, align: 0.5)
-        ctx.restoreGState()
     }
     let peek = outCubic(prog(t, T.toEnd + 0.9, T.toEnd + 1.6))
     if peek > 0 { drawImage(pondaHappy, in: CGRect(x: 290, y: 1920 - 470 * CGFloat(peek), width: 500, height: 500)) }
@@ -198,7 +200,8 @@ let recipe = Recipe(
     space: .room, colour: .bright, sidechain: 0.4, seed: 31)
 
 func score(_ s: Score) {
-    s.compose(recipe, [Section(from: 0, to: T.toScale, energy: 2), Section(from: T.toScale, to: T.toProof, energy: 3),
+    // Tempo phase: the problem ("Cooking for 40?") sits on a heavy half-time groove; the full groove lands with the fix.
+    s.compose(recipe, [Section(from: 0, to: T.toScale, energy: 2, feel: .half), Section(from: T.toScale, to: T.toProof, energy: 3),
                        Section(from: T.toProof, to: T.toEnd, energy: 2), Section(from: T.toEnd, to: 30, energy: 0)])
     s.music.add(impact(), at: 0, gain: 0.8)
     s.cue(0, "Cooking for 40?", stampHit(), 0.6)

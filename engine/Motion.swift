@@ -119,3 +119,103 @@ func glowRing(around r: CGRect, _ p: Double, colour: Col = Col(0xFFFFFF)) {
     let ring = r.insetBy(dx: -(clear + 70 * CGFloat(outCubic(p))), dy: -(clear + 70 * CGFloat(outCubic(p))))
     stroke(rr(ring, ring.height / 2), colour.alpha(CGFloat(0.7 * (1 - p))), 5)
 }
+
+// MARK: - Entrances and exits for anything
+
+/// How a thing enters or leaves: images, screens, cards, stickers, icons, illustrations, or a whole text block
+/// (Kinetic's own `TextIn` moves letters, words and lines; use `.none` there and `show` to move the block).
+/// For slides and flies, the side is where the thing is while hidden: it comes in from there, and leaves toward it.
+enum Appear {
+    case cut               // just there, or just gone
+    case fade
+    case pop               // grows from 60 % with a small overshoot: small things only (stickers, icons, chips, avatars)
+    case zoom              // grows from 88 % while fading in, no overshoot: cards, screens, photos
+    case rise              // comes up 80 px while fading in
+    case drop              // falls in from above and settles: small things
+    case slide(Side)       // travels in from a side while fading in
+    case fly(Side)         // comes in from beyond the frame's edge on that side, without a fade
+    case wipe(Side)        // revealed by an edge moving away from that side
+    case iris              // a circle opens from its centre
+    case blur              // sharpens out of a blur while fading in
+    case flip              // turns in like a card on its vertical axis
+    case spin              // turns in from a quarter turn while growing
+}
+
+/// Draws `draw` (everything inside `rect`) entering at `from` and, if `until` is set, leaving so that it's gone at `until`.
+/// `length` is the entrance's duration; an exit takes 80 % of it. Text inside isn't counted as readable by `check`
+/// while it moves. Example: `show(card, t: t, from: T.cards, enter: .slide(.left)) { drawScreen(shot, in: card) }`.
+func show(_ rect: CGRect, t: Double, from: Double, until: Double? = nil, enter: Appear = .fade, exit: Appear = .fade,
+          length: Double = 0.45, _ draw: () -> Void) {
+    guard t >= from else { return }
+    let cutsIn: Bool = { if case .cut = enter { return true }; return false }()
+    let cutsOut: Bool = { if case .cut = exit { return true }; return false }()
+    let pIn = length > 0 && !cutsIn ? prog(t, from, from + length) : 1
+    let pOut = until.map { u in length > 0 && !cutsOut ? prog(t, u - length * 0.8, u) : (t >= u ? 1 : 0) } ?? 0
+    guard pOut < 1 else { return }
+    let moving = pIn < 1 || pOut > 0
+    appearing(exit, visible: 1 - pOut, entering: false, rect) {
+        appearing(enter, visible: pIn, entering: true, rect) {
+            if moving { unlogged(draw) } else { draw() }
+        }
+    }
+}
+
+/// One motion at `visible` (0 hidden … 1 fully shown). Entrances ease out; exits ease in.
+func appearing(_ m: Appear, visible v: Double, entering: Bool, _ r: CGRect, _ draw: () -> Void) {
+    if v >= 1 { draw(); return }
+    guard v > 0 else { return }
+    let e = CGFloat(entering ? outCubic(v) : 1 - inCubic(1 - v))
+    let c = CGPoint(x: r.midX, y: r.midY)
+    var alpha: CGFloat = 1, scaleX: CGFloat = 1, scaleY: CGFloat = 1, dx: CGFloat = 0, dy: CGFloat = 0, rot: CGFloat = 0
+    var clip: CGPath? = nil
+    switch m {
+    case .cut: break
+    case .fade: alpha = e
+    case .pop:
+        let k = entering ? CGFloat(outBack(v, 1.5)) : e
+        scaleX = 0.6 + 0.4 * k; scaleY = scaleX; alpha = CGFloat(min(1, v * 3))
+    case .zoom: scaleX = 0.88 + 0.12 * e; scaleY = scaleX; alpha = e
+    case .rise: dy = 80 * (1 - e); alpha = e
+    case .drop:
+        let k = entering ? CGFloat(outBack(v, 1.3)) : e
+        dy = -140 * (1 - k); alpha = CGFloat(min(1, v * 3))
+    case .slide(let side):
+        let d = (side == .left || side == .right ? W : H) * 0.18 * (1 - e)
+        switch side { case .left: dx = -d; case .right: dx = d; case .up: dy = -d; case .down: dy = d }
+        alpha = e
+    case .fly(let side):
+        switch side {
+        case .left: dx = -(r.maxX + 40) * (1 - e)
+        case .right: dx = (W - r.minX + 40) * (1 - e)
+        case .up: dy = -(r.maxY + 40) * (1 - e)
+        case .down: dy = (H - r.minY + 40) * (1 - e)
+        }
+    case .wipe(let side):
+        let pad: CGFloat = 60, b = r.insetBy(dx: -pad, dy: -pad)
+        switch side {
+        case .left: clip = CGPath(rect: CGRect(x: b.minX, y: b.minY, width: b.width * e, height: b.height), transform: nil)
+        case .right: clip = CGPath(rect: CGRect(x: b.maxX - b.width * e, y: b.minY, width: b.width * e, height: b.height), transform: nil)
+        case .up: clip = CGPath(rect: CGRect(x: b.minX, y: b.minY, width: b.width, height: b.height * e), transform: nil)
+        case .down: clip = CGPath(rect: CGRect(x: b.minX, y: b.maxY - b.height * e, width: b.width, height: b.height * e), transform: nil)
+        }
+    case .iris:
+        clip = CGPath(ellipseIn: centred(c, hypot(r.width, r.height) / 2 * e + 1), transform: nil)
+    case .blur:
+        let img = layer(draw)
+        drawLayer(gaussianBlurred(img, sigma: Double(26 * (1 - e))), alpha: e)
+        return
+    case .flip: scaleX = max(0.002, e); alpha = min(1, e * 2)
+    case .spin: rot = (1 - e) * .pi / 2; scaleX = 0.7 + 0.3 * e; scaleY = scaleX; alpha = e
+    }
+    ctx.saveGState()
+    if let clip { ctx.addPath(clip); ctx.clip() }
+    ctx.translateBy(x: c.x + dx, y: c.y + dy)
+    if rot != 0 { ctx.rotate(by: rot) }
+    ctx.scaleBy(x: scaleX, y: scaleY)
+    ctx.translateBy(x: -c.x, y: -c.y)
+    ctx.setAlpha(alpha)
+    ctx.beginTransparencyLayer(auxiliaryInfo: nil)        // so nested fades multiply, whatever `draw` does with alpha
+    draw()
+    ctx.endTransparencyLayer()
+    ctx.restoreGState()
+}

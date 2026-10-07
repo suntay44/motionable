@@ -36,9 +36,12 @@ Look for, and note where each fact came from:
 - **Voice and world:** quote 2–3 real lines of its copy (store description, onboarding, empty states) and note the world it lives in. Plan mode reads the personality from these.
 - **Pictures:**
   - the app icon (`AppIcon.appiconset` → the largest PNG), logos, `Screenshots/`, `fastlane/screenshots/`, `Website/`, `assets/`;
-  - the README's images and preview videos.
+  - the README's images and preview videos;
+  - **screen recordings** (`*.mov`, `*.mp4`, e.g. in `AppPreview/`, `Screenshots/`, `fastlane/`, `Docs/`): these are the best evidence of the app working. Read each with `bash ROOT/scripts/footage.sh <video>` (its timeline of taps, typing and new screens) and look at its moments with `footage.sh <video> sheet <s> …`. A log of taps or a script beside a recording is worth reading too.
 
 Look at each candidate image with the Read tool, keep the product screenshots and the logo, and skip mockups that don't show the real UI.
+
+**Recordings beat screenshots** for the signature moment: if there are none, offer to capture one from the Simulator while the user taps through the flow (`xcrun simctl io booted recordVideo --codec=h264 <film>/assets/<name>.mov`, stopped with Ctrl-C when they say done), or ask them to drop one in.
 
 **If the folder is code only, with no screenshots,** say so. Offer to wait while the user captures 3+ screenshots, or to use any they drop in. For an iOS app the user can run in the Simulator, they can open each screen while you capture it with `xcrun simctl io booted screenshot <film>/assets/screen-<name>.png` (status bar at 9:41: `xcrun simctl status_bar booted override --time 9:41`).
 

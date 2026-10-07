@@ -35,6 +35,7 @@
 |---|---|---|
 | Energy & pacing | 1 of 5; one continuous night-to-morning shot | Sleep is slow; the change of light is the event |
 | Tempo & feel | 72 BPM, **3/4** (a lullaby) | Bedtime rhythm |
+| Tempo phases | A ramp from 72 to 60 BPM over the final two beats into the end card | A lullaby winding down, like falling asleep |
 | Key & mode | A♭ major, I–vi–IV–V, maj7 | Warm and familiar |
 | Drum language | Lo-fi: a soft kick, rim, shaker; no fills (the morning swells in) | Nothing to wake you |
 | Instruments | Music-box bells (echo), pad, kalimba in the morning, sub | Lullaby |
@@ -42,6 +43,9 @@
 | Signature sounds | A slide whistle for the zzz, a riser at dawn, a soft ding for bedtime, a music-box cadence | The world of sleep |
 | Palette use | Night navy → Bonnie blue (morning) → dusk violet → Bonnie blue | The day's light |
 | Type | SF Rounded Heavy | The app's own face |
+| Type mix | SF Rounded Heavy, with the morning's phrase in Semibold | Softer at sunrise |
+| Colour mix | White, with the night's time words in moonlight gold ("today?", "go to bed.") | Gold is the moon's colour; on the morning blue it would fall below 3:1, so mornings stay white |
+| Motion vocabulary | The watch rises; answer pills slide in; the bedtime card zooms; the icon and the CTA pill pop; the moon sets down and away | Gentle: nothing bounces except the smallest things |
 | Framing | A drawn watch case with the real watch screen; the real Home tiles with a spotlit lift | Real UI, big |
 | Transitions | An in-shot colour shift, uncover (down, like the day setting), a star from the moon | Night-sky shapes |
 | Elements | Stars, sparkles, answer pills | The app's three answers as mini images |
@@ -50,6 +54,7 @@
 
 ## Fingerprint
 - tempo: 72 in 3/4 · mode: A♭ major maj7 · drums: lo-fi, no fills · lead instrument: music-box bells
-- colour: warm · type face: SF Rounded Heavy · hook device: the app's own question at night
+- colour: warm · type face: SF Rounded Heavy · type mix: heavy + semibold, moonlight gold at night · hook device: the app's own question at night
+- motion vocabulary: rise, slide, zoom; pop only on the smallest things
 - transitions: in-shot colour shift, uncover, star · end card: icon + name + line + pill
 - background: night → morning → dusk gradients with stars · format: 1:1 · seed: 72

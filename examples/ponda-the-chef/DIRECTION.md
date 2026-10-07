@@ -35,6 +35,7 @@
 |---|---|---|
 | Energy & pacing | 4 of 5; shots of 4–6 s, two moves inside each | A busy kitchen, but every line must be readable |
 | Tempo & feel | 122 BPM, straight | Upbeat service rush, but not frantic |
+| Tempo phases | Half-time groove under "Cooking for 40?", the full groove from the reveal | The problem feels heavy; the fix lands with energy |
 | Key & mode | F major, I–V–vi–IV | Cheerful and familiar |
 | Harmony colour | add9 | Bright, a little sweet, like the mascot |
 | Drum language | Punchy pop: kick on 1 and the "and" of 2, claps on 2 and 4, shaker 8ths | Clean energy under a lot of picture |
@@ -43,6 +44,9 @@
 | Signature sounds | Knife chop on the slice, ka-ching on every price, sizzle under the list, a boing for Ponda | The product's world |
 | Palette use | Red for the hook and proof, off-white for the screens, pale red for costs | The app's own palette, alternating for rhythm |
 | Type | Avenir Next Heavy (geometric, close to Inter); stamp in the hook, rise for headlines, chips sliding | Friendly and strong |
+| Type mix | One face (Avenir Next Heavy); numbers 1.22× bigger ("40?") | Its signature numbers are the hero |
+| Colour mix | Ink, with each benefit's key word in Ponda red ("any", "plate", "the week"); cream on red | One accent with one job: the benefit word |
+| Motion vocabulary | Screens slide in from their side; stickers, chips and the CTA pill pop; headlines rise; Ponda pops and bobs | A busy kitchen, but every kind of thing moves one way |
 | Framing | Plates grid (icons), whole screen with a redrawn counter, a lifted callout, a scrolling list, benefit chips | ≥3 framings, all real UI |
 | Transitions | Slice, push, zoom-through, columns, iris | A knife cut fits the world; 5 kinds |
 | Camera | Beat pulse, a slow glide on the list | Keep the UI readable |
@@ -53,6 +57,7 @@
 
 ## Fingerprint
 - tempo: 122 straight · mode: F major add9 · drums: punchy pop · lead instrument: plucked guitar
-- colour: bright · type face: AvenirNext-Heavy · hook device: problem question + multiplying icons
+- colour: bright · type face: AvenirNext-Heavy · type mix: one face, bigger numbers, red key words · hook device: problem question + multiplying icons
+- motion vocabulary: screens slide, small things pop, headlines rise
 - transitions: slice, push, zoomThrough, columns, iris · end card: icon + name + pill CTA + peeking mascot
 - background: red / off-white alternating · seed: 31

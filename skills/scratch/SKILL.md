@@ -35,7 +35,7 @@ Use the **AskUserQuestion** tool if it's available: at most 4 questions per call
 
 ## 2. Collect the pictures
 
-Ask the user to **drag in, or give paths to: a logo + 3–8 product screenshots** (different screens: the main screen, the best feature, and one more), and brand colours if they know them.
+Ask the user to **drag in, or give paths to: a logo + 3–8 product screenshots** (different screens: the main screen, the best feature, and one more), and brand colours if they know them. **A short screen recording of the best feature** (QuickTime, the Simulator, or the phone's own screen recording) is the most valuable thing they can add: films that show the app working are the ones people remember. Read it with `bash ROOT/scripts/footage.sh <video>`.
 - Look at each image with the Read tool so you know what it shows.
 - Pick the colours from the logo and screenshots if none were given.
 

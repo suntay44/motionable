@@ -25,6 +25,17 @@ enum Join {
     case burn(Col)                             // a film-burn overexposure that hides the change
     case columns(Int)                          // the new clip drops in as staggered columns
 }
+extension Join {
+    /// True when both scenes are visible in the same place during the join (a dissolve, a mask, a zoom through), so
+    /// their text can collide; false when one scene slides over, past or away from the other.
+    var seeThrough: Bool {
+        switch self {
+        case .dissolve, .zoomThrough, .iris, .shape, .blinds, .glitch, .pixelate, .burn, .columns: return true
+        case .cut, .dip, .flash, .push, .cover, .uncover, .whip, .slice, .spin: return false
+        }
+    }
+}
+
 enum JoinShape { case star(points: Int), roundedSquare, diamond, heart, blob(seed: Int) }
 
 struct Clip {
@@ -33,8 +44,9 @@ struct Clip {
     let draw: (Double) -> Void        // draws the clip at absolute time t (it may be asked slightly outside [from, to) during joins)
 }
 
-/// Where the film's joins are (time, length), so `sheet` with no times can show every join mid-way.
-var reelJoins: [(at: Double, duration: Double)] = []
+/// Where the film's joins are (time, length, and whether both scenes show through each other in it), for `sheet`,
+/// `storyboard` and the layout audit.
+var reelJoins: [(at: Double, duration: Double, seeThrough: Bool)] = []
 
 struct Reel {
     let clips: [Clip]
@@ -44,7 +56,7 @@ struct Reel {
     init(_ clips: [Clip], joins: [(Join, Double)]) {
         precondition(joins.count == max(0, clips.count - 1), "a Reel needs one join between each pair of clips")
         self.clips = clips; self.joins = joins
-        reelJoins = zip(clips, joins).map { (at: $0.0.to, duration: $0.1.1) }
+        reelJoins = zip(clips, joins).map { (at: $0.0.to, duration: $0.1.1, seeThrough: $0.1.0.seeThrough) }
     }
 
     func draw(_ t: Double) {

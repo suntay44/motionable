@@ -50,6 +50,10 @@ Source: [Google Play badge guidelines](https://partnermarketinghub.withgoogle.co
 28. **Vary the shot lengths.** Shots of one length feel mechanical; `check` warns.
 29. **No stock-music formula:** no ukulele and whistling, no swoosh-and-claps "startup" build. The sound comes from the product's world (PLAN.md).
 30. **Brand moments are short.** The icon or logo reveal takes under a second; then the end card holds still.
+31. **Type mixes stay readable.** At most 3 faces in a film; a mix of face, weight, italic or colour goes on 1–2 words a line, and each accent has a job (the number, the benefit word, the name). Every line keeps **3:1 contrast** with what's behind it; `check` measures it and fails lower.
+32. **One motion vocabulary.** Each kind of thing enters and leaves the same way through the film (screens one way, small accents another, text its own), chosen in plan mode. Bounce (pop, drop) only on small things.
+33. **Footage stays true.** Speed it, trim it, zoom into it and freeze it, but never change what the app did. Draw on top only to act out what the app really does (a finger on a recorded tap, a tick that syncs), and keep typing slow enough to read (about 2.5× at most).
+34. **Every keyframe composes.** Before anything moves, each beat's settled frame passes `storyboard`: no overlapping or cut-off text, no crop through UI, no accidental emptiness. New text arrives after a see-through join, not during it.
 
 ## Illustrations
 

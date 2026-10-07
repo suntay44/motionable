@@ -5,6 +5,7 @@
 //        motionable <project-dir> stills <t> [<t> …]     out/stills/still-<t>.png
 //        motionable <project-dir> sheet <t> [<t> …]      out/sheet.png (one contact sheet)
 //        motionable <project-dir> check                  readability: lines that leave too soon, text in safe zones
+//        motionable <project-dir> storyboard             out/storyboard.png: each beat's settled keyframe, laid out and audited
 //        motionable <project-dir> draft                  out/<name>-draft.mp4: half size, 30 fps, ~3× faster (internal review)
 //        motionable <project-dir> video                  out/<name>.mp4 (renders the audio too)
 //        motionable <project-dir> video effects          out/<name>-effects.mp4: sound effects only, for a platform sound or a licensed track
@@ -37,6 +38,9 @@ case "sheet":
     print("wrote \(url.path)")
 case "check":
     runReadabilityCheck()
+case "storyboard":
+    try FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+    runStoryboard(to: out.appendingPathComponent("storyboard.png"))
 case "video", "draft":
     let s = Score(bpm: film.bpm)
     film.score(s)

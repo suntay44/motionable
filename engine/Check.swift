@@ -12,11 +12,14 @@ let checkScale: CGFloat = 0.5
 var deviceScale: CGFloat = 1
 
 final class TextLog {
-    struct Sighting { let t: Double; let rect: CGRect }
+    struct Sighting { let t: Double; let rect: CGRect; let colours: [Col]; var contrast: Double? = nil; var ink: Double? = nil }
     var seen: [String: [Sighting]] = [:]
     var muted = 0
     var t = 0.0
+    var thisFrame: [(key: String, index: Int)] = []     // sightings to measure once the frame is drawn
 }
+/// Text needs this contrast against what's behind it (WCAG's minimum for large text; motionable's text is all large).
+let minimumContrast = 3.0
 /// Where platform UI covers the video, by format (canvas fractions). Sources in RESEARCH.md.
 /// Portrait 9:16: the union of Meta Reels' keep-clear zones (top 14 %, bottom 35 %, sides 6 %) and YouTube Shorts'
 /// (top 10 %, bottom 25 %, right 10 %); TikTok publishes templates, not numbers. Key text lives in the band between.
@@ -43,14 +46,15 @@ func uiZones() -> [(name: String, rect: CGRect)] {
 var textLog: TextLog?
 
 /// Records a readable line that is fully on screen now (called by text drawing; cheap no-op outside `check`).
-func noteText(_ s: String, size: CGFloat, rect: CGRect) {
+func noteText(_ s: String, size: CGFloat, rect: CGRect, colours: [Col] = []) {
     guard let log = textLog, log.muted == 0, size >= 34 else { return }
     let clean = s.trimmingCharacters(in: .whitespaces)
     guard clean.count >= 2 else { return }
     let device = ctx.convertToDeviceSpace(rect)                     // device pixels (top-down here), at deviceScale
     let k = 1 / deviceScale
     let top = CGRect(x: device.minX * k, y: device.minY * k, width: device.width * k, height: device.height * k)
-    log.seen[clean, default: []].append(TextLog.Sighting(t: log.t, rect: top))
+    log.seen[clean, default: []].append(TextLog.Sighting(t: log.t, rect: top, colours: colours))
+    log.thisFrame.append((clean, log.seen[clean]!.count - 1))
 }
 /// Runs `draw` without recording its text (decorative or intermediate text: tickers, rolling digits, scrambles).
 func unlogged(_ draw: () -> Void) {
@@ -64,6 +68,9 @@ func unlogged(_ draw: () -> Void) {
 func runReadabilityCheck(fps: Double = 20) -> Bool {
     let log = TextLog()
     textLog = log
+    let layout = LayoutLog()
+    layoutLog = layout
+    defer { layoutLog = nil }
     let c = CGContext(data: nil, width: Int(W * checkScale), height: Int(H * checkScale), bitsPerComponent: 8, bytesPerRow: 0,
                       space: srgb, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
     let frames = Int(film.duration * fps)
@@ -74,6 +81,9 @@ func runReadabilityCheck(fps: Double = 20) -> Bool {
     for f in 0..<frames {
         let t = Double(f) / fps
         log.t = t
+        layout.t = t
+        layout.inJoin = reelJoins.contains { abs(t - $0.at) < $0.duration / 2 + 0.02 }
+        layout.seeThrough = reelJoins.contains { abs(t - $0.at) < $0.duration / 2 + 0.02 && $0.seeThrough }
         c.saveGState()
         c.translateBy(x: 0, y: H * checkScale); c.scaleBy(x: checkScale, y: -checkScale)
         ctx = c
@@ -83,6 +93,14 @@ func runReadabilityCheck(fps: Double = 20) -> Bool {
         c.restoreGState()
         if t < film.holdFrom && isEmptyFrame(c) { flat.append(t) }
         lumas.append(meanLuminance(c))
+        for s in log.thisFrame {
+            let sighting = log.seen[s.key]![s.index]
+            let m = measureContrast(c, rect: sighting.rect, colours: sighting.colours)
+            log.seen[s.key]![s.index].contrast = m?.ratio
+            log.seen[s.key]![s.index].ink = m?.ink
+        }
+        log.thisFrame.removeAll()
+        auditFrame(c, holdFrom: film.holdFrom)
     }
     textLog = nil
 
@@ -175,9 +193,98 @@ func runReadabilityCheck(fps: Double = 20) -> Bool {
     if let t = flashing { print(String(format: "flashing: ✗ more than three flashes within a second from %.2f s; slow them down or soften them (seizure risk)", t)) }
     else { print("flashing: ✓ within the three-flashes-a-second limit") }
 
-    let ok = report.allSatisfy(\.3) && zoneHits.isEmpty && dead.isEmpty && flashing == nil
+    // Contrast: each line against what is actually behind it, measured on the rendered frames (the median of its sightings).
+    var lowContrast: [String] = []
+    for (k, sightings) in log.seen {
+        let ratios = sightings.compactMap(\.contrast).sorted()
+        guard ratios.count >= 3 else { continue }
+        let median = ratios[ratios.count / 2]
+        if median < minimumContrast { lowContrast.append(String(format: "\"%@\" is %.1f:1 against its background", k, median)) }
+    }
+    if lowContrast.isEmpty { print(String(format: "contrast: ✓ every line at %.0f:1 or more against its background", minimumContrast)) }
+    else { for l in lowContrast.sorted() { print(String(format: "contrast: ✗ %@ (needs %.0f:1): darken, lighten or back it with a plate", l, minimumContrast)) } }
+
+    // Covered text: a line whose own ink mostly disappears while it's steadily on screen (a finger, a card or a sticker
+    // over it). Its first and last half second (fades) and joins (the next scene covering it) don't count.
+    func inJoin(_ t: Double) -> Bool { reelJoins.contains { abs(t - $0.at) < $0.duration / 2 + 0.05 } }
+    for k in keys where !counting.contains(k) {
+        let all = log.seen[k]!.sorted { $0.t < $1.t }
+        var visibility: [[TextLog.Sighting]] = []
+        for s in all { if let last = visibility.last?.last, s.t - last.t <= 1.6 / fps { visibility[visibility.count - 1].append(s) } else { visibility.append([s]) } }
+        var steady: [(Double, Double)] = []
+        for run in visibility {
+            guard let a = run.first?.t, let b = run.last?.t else { continue }
+            steady += run.filter { $0.t >= a + 0.5 && $0.t <= b - 0.5 && !inJoin($0.t) }.compactMap { s in s.ink.map { (s.t, $0) } }
+        }
+        guard steady.count >= 6 else { continue }
+        let median = steady.map(\.1).sorted()[steady.count / 2]
+        guard median > 0.06 else { continue }
+        var runStart: Double? = nil, prev = -1.0
+        for (t, _) in steady.filter({ $0.1 < median * 0.7 }) + [(Double.infinity, 0)] {        // 30 % or more of it hidden
+            if let s = runStart, t - prev > 1.6 / fps {
+                if prev - s + 1 / fps >= 0.2 {
+                    print(String(format: "layout: ⚠ something covers \"%@\" from %.2f–%.2f s: keep fingers, stickers and cards off text people need to read", k, s, prev + 1 / fps))
+                }
+                runStart = nil
+            }
+            if runStart == nil { runStart = t }
+            prev = t
+        }
+    }
+    let layoutOK = reportLayout(fps: fps, holdFrom: film.holdFrom)
+
+    let ok = report.allSatisfy(\.3) && zoneHits.isEmpty && dead.isEmpty && flashing == nil && lowContrast.isEmpty && layoutOK
     print(ok ? "verdict: readable" : "verdict: fix the lines marked ✗")
     return ok
+}
+
+/// WCAG relative luminance of an sRGB colour (0…1).
+func relativeLuminance(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat) -> Double {
+    func lin(_ v: CGFloat) -> Double { let x = Double(v); return x <= 0.04045 ? x / 12.92 : pow((x + 0.055) / 1.055, 2.4) }
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+}
+/// Contrast between text in `colours` and the pixels behind it inside `rect` (canvas units) on the check bitmap:
+/// samples a grid, sets aside the samples that are the text's own colour, and takes the median of the rest as the
+/// background. Translucent text is blended over that background first. Nil when the rect is mostly text or off-frame.
+func measureContrast(_ c: CGContext, rect: CGRect, colours: [Col]) -> (ratio: Double, ink: Double)? {
+    guard !colours.isEmpty, let data = c.data else { return nil }
+    let w = c.width, h = c.height, bpr = c.bytesPerRow
+    let px = data.bindMemory(to: UInt8.self, capacity: bpr * h)
+    let r = CGRect(x: rect.minX * checkScale, y: rect.minY * checkScale, width: rect.width * checkScale, height: rect.height * checkScale)
+        .intersection(CGRect(x: 0, y: 0, width: w, height: h))
+    guard !r.isNull, r.width > 6, r.height > 6 else { return nil }
+    var samples: [(r: Int, g: Int, b: Int)] = []
+    for gy in 0..<12 {
+        for gx in 0..<36 {
+            let x = min(w - 1, Int(r.minX + (CGFloat(gx) + 0.5) * r.width / 36)), y = min(h - 1, Int(r.minY + (CGFloat(gy) + 0.5) * r.height / 12))
+            let o = y * bpr + x * 4
+            samples.append((Int(px[o]), Int(px[o + 1]), Int(px[o + 2])))
+        }
+    }
+    let total = samples.count
+    // The text's own pixels: its colours as given, and (for translucent text) blended over a first guess at the background.
+    let guess = samples.sorted { $0.r + $0.g + $0.b < $1.r + $1.g + $1.b }[total / 2]
+    var inks = colours.map { (Int($0.r * 255), Int($0.g * 255), Int($0.b * 255)) }
+    for col in colours where col.a < 0.99 {
+        let a = col.a
+        inks.append((Int(col.r * 255 * a + CGFloat(guess.r) * (1 - a)), Int(col.g * 255 * a + CGFloat(guess.g) * (1 - a)),
+                     Int(col.b * 255 * a + CGFloat(guess.b) * (1 - a))))
+    }
+    var back: [(r: Int, g: Int, b: Int, l: Double)] = []
+    for sm in samples where !inks.contains(where: { abs($0.0 - sm.r) + abs($0.1 - sm.g) + abs($0.2 - sm.b) < 40 }) {
+        back.append((sm.r, sm.g, sm.b, relativeLuminance(CGFloat(sm.r) / 255, CGFloat(sm.g) / 255, CGFloat(sm.b) / 255)))
+    }
+    guard back.count >= total / 4 else { return nil }
+    back.sort { $0.l < $1.l }
+    let bg = back[back.count / 2]
+    let ink = Double(total - back.count) / Double(total)              // how much of the rect is the text's own colour
+    let ratio = colours.map { col -> Double in
+        let a = col.a       // translucent text: what the eye sees is the colour blended over the background
+        let rr = col.r * a + CGFloat(bg.r) / 255 * (1 - a), gg = col.g * a + CGFloat(bg.g) / 255 * (1 - a), bb = col.b * a + CGFloat(bg.b) / 255 * (1 - a)
+        let lt = relativeLuminance(rr, gg, bb)
+        return (max(lt, bg.l) + 0.05) / (min(lt, bg.l) + 0.05)
+    }.min() ?? 21
+    return (ratio, ink)
 }
 
 /// The frame's mean relative luminance (0…1, linear light), from a coarse grid of the bitmap.

@@ -5,7 +5,7 @@ Each folder is a finished film: its plan (`DIRECTION.md`), its beat grid (`SCRIP
 | Film | Format | What it shows |
 |---|---|---|
 | [ponda-the-chef](ponda-the-chef) | 9:16 · 30 s · Reels, TikTok, Shorts | A problem hook ("Cooking for 40?"); servings roll 4 → 40 on the real Scaling screen; the cost per plate lifts out; the cart's total; proof chips; punchy pop at 122 BPM |
-| [owly-wide](owly-wide) | 16:9 · 23 s · YouTube, a website | Mom's texts pile up; her list lands on her son's widget, he ticks it, "Done by Leo" arrives; the day-is-full bar; a drawn quill; piano and kalimba at 88 BPM |
+| [owly-wide](owly-wide) | 16:9 · 25 s · YouTube, a website | **Real screen recordings:** Mom types a task on her phone (the camera zooms in on the typing), it lands on her son's widget, he ticks it, "Done by Leo" arrives; the day-is-full bar; a drawn quill; piano and kalimba at 88 BPM |
 | [bonnie](bonnie) | 1:1 · 15 s · feeds | Night turns to morning in one shot and the watch answers "Ready"; the bedtime tile under a spotlight; a 3/4 music-box lullaby at 72 BPM |
 | [owly](owly) | 9:16 · 30 s | v0.1: the film motionable grew out of |
 

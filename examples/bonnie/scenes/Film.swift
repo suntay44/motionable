@@ -5,22 +5,25 @@ import AppKit
 
 func makeFilm() -> Film {
     Film(name: "bonnie", width: 1080, height: 1080, fps: 60, duration: 15, bpm: T.bpm,
-         holdFrom: T.hold, draw: frame, score: score)
+         holdFrom: T.hold, draw: frame, score: score, keyframes: [2.2, 7.6, 11.0, 14.95], tempo: phases)
 }
 
 // MARK: - Timeline (72 BPM, 3/4: a bar is 3 beats, 2.5 s)
 
+// Tempo phase: the lullaby winds down from 72 to 60 BPM over the last bar before the end card, like falling asleep.
+let phases = TempoMap(72, [.ramp(from: 12, to: 14, bpm: 60)])
+
 enum T {
     static let bpm = 72.0, beat = 60 / bpm
-    static func b(_ n: Double) -> Double { n * beat }
+    static func b(_ n: Double) -> Double { phases.time(ofBeat: n) }
     static let zzz = b(1)
     static let dawn = b(3)                         // the sky turns from night to morning over a beat and a bit
     static let watchIn = b(3.55), morning = b(4), ready = b(4.6)
     static let pills = [b(5), b(5.75), b(6.5)]
     static let toBed = b(10), bedLift = b(11.5)
     static let toEnd = b(14)
-    static let name = b(14.15), line = b(14.4), pill = b(14.6)
-    static let hold = 13.9
+    static let name = b(14.1), line = b(14.25), pill = b(14.4)   // after the slowdown, beats are a second long
+    static let hold = 14.0
 }
 
 // MARK: - Look
@@ -30,6 +33,9 @@ let duskTop = Col(0x0E1446), duskBottom = Col(0x33307E)
 let white = Col(0xFFFFFF), moonGold = Col(0xFFE9A8), ink = Col(0x101828)
 let green = Col(0x30C85E), amber = Col(0xF5A623), coral = Col(0xF0564A)
 let round = Face.system(.heavy, .rounded), roundBold = Face.system(.bold, .rounded), roundSemi = Face.system(.semibold, .rounded)
+// Type mix: SF Rounded heavy; the time words take moonlight gold at night (gold on the morning blue would drop below
+// 3:1), and a softer weight in the morning.
+let moonlight = TextStyle(colour: Col(0xFFE9A8)), softer = TextStyle(face: .system(.semibold, .rounded))
 let watchShot = loadImage("assets/watch-today.png"), home = Screenshot("assets/home-dark.png")
 let appIcon = loadImage("assets/bonnie-icon.png")
 let moon = loadDrawing("assets/drawn/moon.svg"), zzz = loadDrawing("assets/drawn/zzz.svg")
@@ -63,17 +69,14 @@ func drawMoon(_ t: Double, at r: CGRect, sink: Double = 0) {
     ctx.restoreGState()
 }
 
-/// One of Bonnie's three answers, as the app shows them: a white pill with a coloured dot (slides in, no bounce).
-func answerPill(_ label: String, dot: Col, at left: CGPoint, p: Double) {
-    guard p > 0 else { return }
-    let e = CGFloat(outCubic(p))
-    let w = textWidth(label, 44, roundBold) + 112
-    let r = CGRect(x: left.x - 60 * (1 - e), y: left.y - 41, width: w, height: 82)
-    ctx.saveGState(); ctx.setAlpha(e)
+/// One of Bonnie's three answers, as the app shows them: a white pill with a coloured dot.
+func answerPillRect(_ label: String, at left: CGPoint) -> CGRect {
+    CGRect(x: left.x, y: left.y - 41, width: textWidth(label, 44, roundBold) + 112, height: 82)
+}
+func answerPill(_ label: String, dot: Col, in r: CGRect) {
     fillShadowed(rr(r, 41), white, blur: 24, alpha: 0.18, dy: 8)
     fill(CGPath(ellipseIn: centred(CGPoint(x: r.minX + 44, y: r.midY), 12), transform: nil), dot)
     text(label, 44, roundBold, ink, r.minX + 72, r.midY + 15)
-    ctx.restoreGState()
 }
 
 // MARK: - Scenes
@@ -96,8 +99,8 @@ func nightToMorning(_ t: Double) {
         ctx.restoreGState()
     }
     // The hook, readable from frame 1 (it has settled before 0).
-    Kinetic(lines: ["Ready for", "today?"], face: round, size: 136, colour: white, x: 84, y: 640,
-            from: -0.6, to: T.dawn + 0.3, enter: .rise, exit: .rise, maxWidth: nil).draw(t)
+    Kinetic(lines: ["Ready for", "*today?*"], face: round, size: 136, colour: white, x: 84, y: 640,
+            from: -0.6, to: T.dawn + 0.3, enter: .rise, exit: .rise, maxWidth: nil, accent: moonlight).draw(t)
 
     // Morning: the watch rises in and answers.
     let wp = outCubic(prog(t, T.watchIn, T.watchIn + 0.7))
@@ -117,11 +120,13 @@ func nightToMorning(_ t: Double) {
         sparkles(around: ready.insetBy(dx: -20, dy: -20), t: t, from: T.ready, count: 6, colour: white, seed: 5, size: 22)
         ctx.restoreGState()
     }
-    Kinetic(lines: ["One answer", "each morning."], face: round, size: 84, colour: white, x: 84, y: 190,
-            from: T.morning, enter: .rise, maxWidth: nil).draw(t)
+    Kinetic(lines: ["One answer", "*each morning.*"], face: round, size: 84, colour: white, x: 84, y: 190,
+            from: T.morning, enter: .rise, maxWidth: nil, accent: softer).draw(t)
     let answers: [(String, Col)] = [("Ready", green), ("Take it easy", amber), ("Recover", coral)]
     for (i, a) in answers.enumerated() {
-        answerPill(a.0, dot: a.1, at: CGPoint(x: 84, y: 470 + CGFloat(i) * 112), p: prog(t, T.pills[i], T.pills[i] + 0.4))
+        // Motion vocabulary (gentle): pills slide in, cards zoom, the watch rises, small things pop.
+        let r = answerPillRect(a.0, at: CGPoint(x: 84, y: 470 + CGFloat(i) * 112))
+        show(r, t: t, from: T.pills[i], enter: .slide(.left), length: 0.4) { answerPill(a.0, dot: a.1, in: r) }
     }
 }
 
@@ -132,11 +137,12 @@ func bedScene(_ t: Double) {
     gradientFill([duskTop, duskBottom], degrees: 90)
     stars(t, seed: 11)
     drawMoon(t, at: CGRect(x: 760, y: 60, width: 230, height: 230))
-    Kinetic(lines: ["And when to", "go to bed."], face: round, size: 84, colour: white, x: 84, y: 170,
-            from: T.toBed + 0.15, enter: .rise, maxWidth: nil).draw(t)
-    let e = outCubic(prog(t, T.toBed, T.toBed + 0.6))
-    let card = drawScreen(home, region: bedRegion, in: CGRect(x: 70, y: 400 + 60 * CGFloat(1 - e), width: 940, height: 610),
-                          radius: 36, snap: false)
+    Kinetic(lines: ["And when to", "*go to bed.*"], face: round, size: 84, colour: white, x: 84, y: 170,
+            from: T.toBed + 0.15, enter: .rise, maxWidth: nil, accent: moonlight).draw(t)
+    let cardBox = CGRect(x: 70, y: 400, width: 940, height: 610), card = fitted(bedRegion, in: cardBox)
+    show(card, t: t, from: T.toBed - 0.1, enter: .zoom, length: 0.6) {
+        drawScreen(home, region: bedRegion, in: cardBox, radius: 36, snap: false)
+    }
     let k = card.width / bedRegion.width
     let tile = CGRect(x: card.minX + (bedTile.minX - bedRegion.minX) * k, y: card.minY + (bedTile.minY - bedRegion.minY) * k,
                       width: bedTile.width * k, height: bedTile.height * k)
@@ -167,15 +173,12 @@ func endScene(_ t: Double) {
             align: 0.5, maxWidth: nil).draw(t)
     Kinetic(lines: ["No account. No ads."], face: roundSemi, size: 46, colour: white.alpha(0.85), x: 540, y: 716, from: T.line,
             enter: .fade, exit: .none, align: 0.5, maxWidth: nil).draw(t)
-    let cp = outCubic(prog(t, T.pill, T.pill + 0.4))
-    if cp > 0 {
-        let label = "Coming soon to the App Store"
-        let w = textWidth(label, 42, roundBold) + 100
-        let pill = CGRect(x: 540 - w / 2, y: 772 + 26 * CGFloat(1 - cp), width: w, height: 90)
-        ctx.saveGState(); ctx.setAlpha(CGFloat(cp))
+    let label = "Coming soon to the App Store"
+    let pw = textWidth(label, 42, roundBold) + 100
+    let pill = CGRect(x: 540 - pw / 2, y: 772, width: pw, height: 90)
+    show(pill, t: t, from: T.pill, enter: .pop, length: 0.4) {
         fill(rr(pill, 45), white)
         text(label, 42, roundBold, blueBottom, 540, pill.minY + 60, align: 0.5)
-        ctx.restoreGState()
     }
 }
 
@@ -215,5 +218,5 @@ func score(_ s: Score) {
     s.cue(T.toEnd - 0.35, "star", whoosh(0.7), 0.18)
     s.cue(T.toEnd, "icon", thumpSnd(), 0.4)
     s.cadence(recipe, at: T.toEnd, length: 4.5, synth: .bell, gain: 0.5)
-    s.fadeOut = (13.9, 14.95)
+    s.fadeOut = (14.0, 14.95)
 }

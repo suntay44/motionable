@@ -4,6 +4,7 @@
 import AppKit
 
 final class Screenshot {
+    let path: String
     let image: CGImage
     let size: CGSize
     /// Quiet rows / columns in image pixels: rows with almost no edges (background between elements).
@@ -13,6 +14,7 @@ final class Screenshot {
     private(set) var edge = Col(0xFFFFFF)
 
     init(_ path: String) {
+        self.path = path
         image = loadImage(path)
         size = CGSize(width: image.width, height: image.height)
         analyse()
@@ -95,8 +97,9 @@ func fitted(_ region: CGRect, in box: CGRect) -> CGRect {
 /// so it is never cropped to the box. Returns the canvas rect it occupies.
 @discardableResult
 func drawScreen(_ s: Screenshot, region: CGRect? = nil, in box: CGRect, radius: CGFloat = 44, shadow: Bool = true,
-                snap: Bool = true, alpha: CGFloat = 1, border: Col? = nil) -> CGRect {
+                snap: Bool = true, alpha: CGFloat = 1, border: Col? = nil, camera: Bool = false) -> CGRect {
     let src = region.map { snap ? s.snapped($0) : $0 } ?? s.bounds
+    if region != nil { noteCrop(s.path, image: s.image, region: src, camera: camera) }
     let dest = fitted(src, in: box)
     let k = dest.width / src.width
     let path = rr(dest, radius)
@@ -128,7 +131,7 @@ struct ScreenMove {
     }
     @discardableResult
     func draw(_ t: Double, in box: CGRect, radius: CGFloat = 44, shadow: Bool = true, alpha: CGFloat = 1) -> CGRect {
-        drawScreen(shot, region: region(t), in: box, radius: radius, shadow: shadow, snap: false, alpha: alpha)
+        drawScreen(shot, region: region(t), in: box, radius: radius, shadow: shadow, snap: false, alpha: alpha, camera: true)
     }
 }
 

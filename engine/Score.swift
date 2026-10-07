@@ -33,6 +33,9 @@ final class Score {
     var sfxLevel: Float = 1.8
     /// `video effects`: only the sound effects, at the level they have in the full mix (for a platform sound or licensed track on top).
     var effectsOnly = false
+    /// Tape stops (the music slows to a halt over the range) and gates (silence over the range), from tempo changes.
+    var stops: [(from: Double, to: Double)] = []
+    var gates: [(from: Double, to: Double)] = []
     private(set) var hits: [Hit] = []
 
     init(bpm: Double) { self.bpm = bpm }
@@ -72,12 +75,24 @@ final class Score {
     }
     /// A 16th-note snare roll that builds into `at`.
     func roll(into at: Double, beats: Double = 1) {
-        let step = beat / 4, count = Int(beats * 4)
+        let step = tempoMap.secondsPerBeat(at: at - 0.01) / 4, count = Int(beats * 4)
         for k in 0..<count { music.add(clap(), at: at - Double(count - k) * step, gain: 0.08 + 0.32 * Float(k) / Float(count)) }
     }
 
     /// Ducks, muffles, masters and writes music.m4a and beats.json into `dir`. Returns the audio URL.
     func finish(to dir: URL, duration: Double) throws -> URL {
+        // Tempo changes: tape stops slow the music to a halt; gates leave a beat of silence before the new tempo.
+        for s in stops { for bus in [music, ducked, verb, echo] { tapeStop(bus, from: s.from, to: s.to) } }
+        for g in gates {
+            for bus in [music, ducked, verb, echo] {
+                let a = max(0, n(g.from)), z = min(NS, n(g.to)), fade = n(0.006)
+                guard z > a else { continue }
+                for i in a..<z {
+                    let k = Float(min(1, Double(min(i - a, z - 1 - i)) / Double(max(1, fade))))
+                    bus.l[i] *= 1 - k; bus.r[i] *= 1 - k
+                }
+            }
+        }
         var duck = [Float](repeating: 1, count: NS)
         for k in kicks {
             let i0 = n(k)
@@ -160,10 +175,30 @@ final class Score {
         try file.write(from: buf)
 
         struct Beats: Encodable { let bpm: Double; let beats: [Double]; let downbeats: [Double]; let hits: [Hit] }
-        let beats = Beats(bpm: bpm, beats: Array(stride(from: 0.0, to: duration, by: beat)),
-                          downbeats: Array(stride(from: 0.0, to: duration, by: 4 * beat)), hits: hits.sorted { $0.t < $1.t })
+        var beatTimes: [Double] = [], b = 0.0
+        while tempoMap.time(ofBeat: b) < duration { beatTimes.append(tempoMap.time(ofBeat: b)); b += 1 }
+        let beats = Beats(bpm: tempoMap.base, beats: beatTimes, downbeats: stride(from: 0, to: beatTimes.count, by: 4).map { beatTimes[$0] },
+                          hits: hits.sorted { $0.t < $1.t })
         let enc = JSONEncoder(); enc.outputFormatting = [.prettyPrinted]
         try enc.encode(beats).write(to: dir.appendingPathComponent("beats.json"))
         return url
+    }
+}
+
+/// A tape stop: over `from…to` the music slows to a halt, pitch falling with it, as when a turntable's power is cut.
+func tapeStop(_ bus: Bus, from t0: Double, to t1: Double) {
+    let a = max(0, n(t0)), z = min(NS, n(t1))
+    guard z > a + 32 else { return }
+    let srcL = Array(bus.l[a..<z]), srcR = Array(bus.r[a..<z])
+    let span = Double(z - a)
+    var pos = 0.0
+    for k in 0..<(z - a) {
+        let i = Int(pos), f = Float(pos - Double(i))
+        let l0 = i < srcL.count ? srcL[i] : 0, l1 = i + 1 < srcL.count ? srcL[i + 1] : 0
+        let r0 = i < srcR.count ? srcR[i] : 0, r1 = i + 1 < srcR.count ? srcR[i + 1] : 0
+        let tail = Float(min(1, (span - Double(k)) / (span * 0.15)))         // fade the last stretch to nothing
+        bus.l[a + k] = (l0 + (l1 - l0) * f) * tail
+        bus.r[a + k] = (r0 + (r1 - r0) * f) * tail
+        pos += 1 - Double(k) / span                                          // the playback rate falls from 1 to 0
     }
 }

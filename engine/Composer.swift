@@ -78,7 +78,10 @@ struct Section {
     var energy: Int
     var muffled = false
     var fill = true                  // false: a rise in energy arrives softly (a swell; no drum fill, riser or crash)
+    var feel: Feel = .normal         // .half: the groove at half speed on the same grid (slower, heavier); .double: drums twice as busy
 }
+/// How a section's groove sits on the tempo: the grid (and every cut on it) stays; the patterns stretch or squeeze.
+enum Feel { case normal, half, double }
 
 /// Sums sounds into one, as long as the longest.
 func mixDown(_ sounds: [[Float]]) -> [Float] {
@@ -125,7 +128,32 @@ extension Score {
     /// Plays a recipe over the sections onto this score (and sets its room, colour and pump).
     func compose(_ r: Recipe, _ sections: [Section]) {
         space = r.space; colour = r.colour; duckDepth = r.sidechain
-        let step = 60 / r.bpm / 4, meter = max(4, r.meter), bar = step * Double(meter)
+        let meter = max(4, r.meter)
+        // Times come from the film's tempo map when it has one (tempo phases), otherwise from the recipe's tempo.
+        let tm = film?.tempo != nil ? tempoMap : TempoMap(r.bpm)
+        func stepTime(_ i: Int) -> Double { tm.time(ofBeat: Double(i) / 4) }
+        func stepLen(_ i: Int) -> Double { stepTime(i + 1) - stepTime(i) }
+        func stepIndex(_ t: Double) -> Int { Int((tm.beat(at: t) * 4).rounded()) }
+        /// The pattern steps of a section: (pattern index, time, step length), stretched or squeezed by its feel.
+        func groove(_ sec: Section, drums: Bool) -> [(p: Int, t: Double, len: Double)] {
+            let i0 = stepIndex(sec.from), i1 = stepIndex(sec.to)
+            guard i1 > i0 else { return [] }
+            func swingAt(_ p: Int, _ len: Double) -> Double { p % 2 == 1 ? r.swing * len : 0 }
+            switch sec.feel {
+            case .half:
+                return stride(from: i0, to: i1, by: 2).map { i in
+                    let p = i0 + (i - i0) / 2, len = stepTime(i + 2) - stepTime(i)
+                    return (p, stepTime(i) + swingAt(p, len), len)
+                }
+            case .double where drums:
+                return (i0..<i1).flatMap { i -> [(p: Int, t: Double, len: Double)] in
+                    let half = stepLen(i) / 2, p = i0 + 2 * (i - i0)
+                    return [(p, stepTime(i), half), (p + 1, stepTime(i) + half + swingAt(p + 1, half), half)]
+                }
+            default:
+                return (i0..<i1).map { i in (i, stepTime(i) + swingAt(i, stepLen(i)), stepLen(i)) }
+            }
+        }
         var g = Seeded(UInt64(r.seed) &* 7919 &+ 3)
         var drumCache: [String: [Float]] = [:]
 
@@ -165,16 +193,13 @@ extension Score {
             ("shaker", r.drums.shaker, 0.22, 1, 0.08), ("tamb", r.drums.tamb, 0.16, 3, 0.1), ("cowbell", r.drums.cowbell, 0.18, 3, 0.15),
             ("clave", r.drums.clave, 0.22, 1, 0.12), ("conga", r.drums.conga, 0.35, 2, 0.15), ("tom", r.drums.tom, 0.5, 3, 0.3)]
 
-        func swung(_ i: Int) -> Double { Double(i) * step + (i % 2 == 1 ? r.swing * step : 0) }
-
         // Drums.
         for sec in sections where sec.energy > 0 {
-            let i0 = Int((sec.from / step).rounded()), i1 = Int((sec.to / step).rounded())
+            let steps = groove(sec, drums: true)
             for (voice, pattern, gain, minE, send) in drumLevels where !pattern.isEmpty && sec.energy >= minE {
                 let pat = Array(pattern)
-                for i in i0..<i1 {
+                for (i, t, step) in steps {
                     let c = pat[i % pat.count]
-                    let t = swung(i)
                     if let v = velocity(c) {
                         let s = drum(voice)
                         music.add(s, at: t, gain: gain * v, pan: voice == "hat" ? 0.15 : (voice == "shaker" ? -0.2 : 0))
@@ -198,14 +223,12 @@ extension Score {
             guard !pat.isEmpty else { continue }
             var hit = 0, prevNote: Int? = nil
             for sec in sections where sec.energy >= part.from {
-                let i0 = Int((sec.from / step).rounded()), i1 = Int((sec.to / step).rounded())
-                for i in i0..<i1 {
+                for (i, t, step) in groove(sec, drums: false) {
                     guard let v = velocity(pat[i % pat.count]) else { continue }
                     var holds = 1
                     while holds < pat.count && pat[(i + holds) % pat.count] == "_" { holds += 1 }
-                    let t = swung(i)
                     let dur = step * Double(holds) * 0.92
-                    let barIndex = Int(floor(Double(i) / Double(meter)))
+                    let barIndex = Int(floor(tm.beat(at: t) * 4 / Double(meter) + 1e-6))
                     let degree = r.progression[(barIndex / max(1, r.barsPerChord)) % r.progression.count]
                     let tones = chordTones(r, degree: degree, octave: part.octave)
                     let root = noteOf(r, degree: degree, octave: part.octave)
@@ -289,6 +312,7 @@ extension Score {
             let prev = sections[k - 1]
             let jump = sec.energy - prev.energy
             let b = sec.from
+            let step = tm.secondsPerBeat(at: b - 0.01) / 4, bar = step * Double(meter)
             if jump > 0 && sec.energy >= 2 && !sec.fill {
                 fx.add(reverseCymbal(bar / 2), at: b - bar / 2, gain: 0.1)
             } else if jump > 0 && sec.energy >= 2 {
@@ -305,8 +329,24 @@ extension Score {
                 fx.add(reverseCymbal(bar / 2), at: b - bar / 2, gain: 0.12)
             }
         }
+        markTempoChanges(r)
     }
 
+    /// Marks the film's tempo changes musically: a tape stop, a hit and a beat of silence, or a riser into the new tempo.
+    func markTempoChanges(_ r: Recipe) {
+        guard film?.tempo != nil else { return }
+        for m in tempoMap.marks {
+            let lb = tempoMap.secondsPerBeat(at: m.t - 0.01)
+            switch m.way {
+            case .cut: break
+            case .tapeStop: stops.append((from: m.t - min(0.7, lb), to: m.t))
+            case .hitStop:
+                hit(r, at: m.t - lb, synth: .stab, gain: 0.5, crashToo: true)
+                gates.append((from: m.t - lb + 0.12, to: m.t))
+            case .riser: fx.add(riser(lb * 4), at: m.t - lb * 4, gain: 0.35)
+            }
+        }
+    }
     /// A closing chord on the tonic (the recipe's colour), ringing out from `at` — for end cards.
     func cadence(_ r: Recipe, at t: Double, length: Double = 3.5, synth: Synth = .pad, gain: Float = 0.5) {
         let tones = chordTones(r, degree: 1, octave: 4)
@@ -331,7 +371,8 @@ extension Score {
     }
     /// A chord stab on the current chord at a picture hit (brass, stab or piano), with a crash if wanted.
     func hit(_ r: Recipe, at t: Double, synth: Synth = .stab, gain: Float = 0.4, crashToo: Bool = false) {
-        let barIndex = Int(floor(t / (240 / r.bpm)))
+        let tm = film?.tempo != nil ? tempoMap : TempoMap(r.bpm)
+        let barIndex = max(0, Int(floor(tm.beat(at: t) * 4 / Double(max(4, r.meter)) + 1e-6)))
         let degree = r.progression[(barIndex / max(1, r.barsPerChord)) % r.progression.count]
         let tones = chordTones(r, degree: degree, octave: 4)
         let s: [Float]

@@ -2,6 +2,7 @@
 import AppKit
 
 enum TextIn {
+    case none                    // all there at once (to move a block as a whole, wrap it in show(…))
     case rise                    // each line rises from behind a mask
     case fade                    // lines fade in, staggered
     case pop                     // each word scales up with an overshoot
@@ -23,6 +24,39 @@ enum TextOut {
 
 /// A block of kinetic text. `x`/`y` place the first line's baseline; `align` 0 = x is the left edge,
 /// 0.5 = x is the centre, 1 = x is the right edge. Lines shrink together to fit `maxWidth`.
+/// A look for some words of a Kinetic line (its `accent`, or one of its `styles`). Unset fields keep the block's own.
+/// Mix faces (a heavy sans with a serif italic), weights, sizes and colours, but keep it to one or two words a line.
+struct TextStyle {
+    var face: Face? = nil
+    var colour: Col? = nil
+    var scale: CGFloat = 1           // size relative to the block (0.5 … 1.6)
+    var mark: Col? = nil             // a highlighter block behind the words
+    var underline: Col? = nil        // a stroke under the words
+}
+
+/// Splits a Kinetic line into spans: `*words*` take the accent style, `{name:words}` a named one, the rest the block's.
+func parseSpans(_ line: String) -> [(text: String, key: String?)] {
+    var out: [(text: String, key: String?)] = []
+    var buf = "", key: String? = nil
+    func flush() { if !buf.isEmpty { out.append((buf, key)); buf = "" } }
+    var i = line.startIndex
+    while i < line.endIndex {
+        let ch = line[i]
+        if ch == "*" && (key == nil || key == "*") {
+            flush(); key = key == nil ? "*" : nil
+        } else if ch == "{", key == nil, let colon = line[i...].firstIndex(of: ":"), let close = line[i...].firstIndex(of: "}"), colon < close {
+            flush(); key = String(line[line.index(after: i)..<colon]); i = colon
+        } else if ch == "}" && key != nil && key != "*" {
+            flush(); key = nil
+        } else {
+            buf.append(ch)
+        }
+        i = line.index(after: i)
+    }
+    flush()
+    return out
+}
+
 struct Kinetic {
     var lines: [String]
     var face: Face
@@ -41,15 +75,26 @@ struct Kinetic {
     var upper = false
     var stagger: Double = 0.06
     var seed: Int = 1
+    var accent: TextStyle? = nil             // the look of *starred* words
+    var styles: [String: TextStyle] = [:]   // looks for {name:words}
 
     func draw(_ t: Double) {
         guard t >= from else { return }
         if let to, t >= to { return }
-        let content = upper ? lines.map { $0.uppercased() } : lines
-        let widest = content.map { textWidth($0, size, face, kern: kern) }.max() ?? 1
+        // Mixed type: *accent* and {name:words} spans change the face, size and colour of their words.
+        let styled = accent != nil || !styles.isEmpty
+        let parsed: [[(text: String, style: TextStyle?)]] = styled ? lines.map { line in
+            parseSpans(line).map { (text: upper ? $0.text.uppercased() : $0.text, style: $0.key == "*" ? accent : $0.key.flatMap { styles[$0] }) }
+        } : []
+        let content = styled ? parsed.map { $0.map(\.text).joined() } : (upper ? lines.map { $0.uppercased() } : lines)
+        func layout(_ sz: CGFloat, _ kn: CGFloat) -> [GlyphLine] {
+            styled ? parsed.map { styledGlyphs($0, sz, face, kern: kn) } : content.map { glyphs($0, sz, face, kern: kn) }
+        }
+        let widest = styled ? (layout(size, kern).map(\.width).max() ?? 1) : (content.map { textWidth($0, size, face, kern: kern) }.max() ?? 1)
         let s = maxWidth.map { min(size, size * $0 / max(widest, 1)) } ?? size
         let k = kern * s / size
-        let set = content.map { glyphs($0, s, face, kern: k) }
+        let set = layout(s, k)
+        func tint(_ gl: Glyph, _ li: Int) -> Col { styled && gl.span >= 0 ? (parsed[li][gl.span].style?.colour ?? colour) : colour }
         let lt = t - from
         let gone: Double = to.map { inCubic(prog(t, $0 - 0.25, $0)) } ?? 0
         let blockW = set.map(\.width).max() ?? 0
@@ -101,7 +146,8 @@ struct Kinetic {
             ctx.saveGState()
             var lineDy: CGFloat = 0, lineAlpha: CGFloat = 1, lineScale: CGFloat = 1
             if enterMasks || exitRises {
-                ctx.clip(to: CGRect(x: -10_000, y: baseline - s * 0.98, width: 30_000, height: s * 1.24))
+                let ascent = max(s * 0.98, line.ascent), descent = max(s * 0.26, line.descent)
+                ctx.clip(to: CGRect(x: -10_000, y: baseline - ascent, width: 30_000, height: ascent + descent))
             }
             switch enter {
             case .rise, .wave:
@@ -128,6 +174,22 @@ struct Kinetic {
             }
             let visible = lineAlpha * blockAlpha
             ctx.setAlpha(visible)
+            // Span marks: a highlighter block behind, or a stroke under, swiping in just after the line arrives.
+            if styled {
+                for (si, sp) in parsed[li].enumerated() where sp.style?.mark != nil || sp.style?.underline != nil {
+                    let mine = line.glyphs.filter { $0.span == si }
+                    guard let lo = mine.map(\.x).min(), let hi = mine.map({ $0.x + $0.advance }).max() else { continue }
+                    let m = CGFloat(outCubic(prog(lt, lineDelay + 0.12, lineDelay + 0.5)))
+                    let sc = sp.style?.scale ?? 1
+                    if let mark = sp.style?.mark, m > 0 {
+                        fill(rr(CGRect(x: x0 + lo - s * 0.08, y: baseline + lineDy - s * 0.74 * sc, width: (hi - lo + s * 0.16) * m,
+                                       height: s * 0.86 * sc), s * 0.1), mark)
+                    }
+                    if let ul = sp.style?.underline, m > 0 {
+                        fill(rr(CGRect(x: x0 + lo, y: baseline + lineDy + s * 0.1, width: (hi - lo) * m, height: max(3, s * 0.065)), s * 0.03), ul)
+                    }
+                }
+            }
 
             var wordMin = [CGFloat](repeating: .greatestFiniteMagnitude, count: max(1, line.words))
             var wordMax = [CGFloat](repeating: 0, count: max(1, line.words))
@@ -141,12 +203,18 @@ struct Kinetic {
                 let pool = Array("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#$%&@")
                 var str = ""
                 for (i, ch) in original.enumerated() { str.append(ch == " " || i < resolved ? ch : pool[g.int(pool.count)]) }
-                if lt >= lineDelay { text(str, s, face, colour, x0, baseline + lineDy, kern: k) }
+                if lt >= lineDelay {
+                    if styled && resolved >= total {
+                        for gl in line.glyphs { drawGlyph(gl, x0 + gl.x, baseline + lineDy, tint(gl, li), alpha: visible) }
+                    } else {
+                        text(str, s, face, colour, x0, baseline + lineDy, kern: k)
+                    }
+                }
             case .typewriter:
                 let shown = typedTotal - charsBefore
                 var caretX = x0
                 for (i, gl) in line.glyphs.enumerated() where i < shown {
-                    drawGlyph(gl, x0 + gl.x, baseline + lineDy, colour, alpha: visible)
+                    drawGlyph(gl, x0 + gl.x, baseline + lineDy, tint(gl, li), alpha: visible)
                     caretX = x0 + gl.x + gl.advance
                 }
                 let typingHere = shown > 0 && shown < line.glyphs.count
@@ -161,7 +229,7 @@ struct Kinetic {
                     switch enter {
                     case .pop:
                         let e = prog(lt, Double(wi) * stagger, Double(wi) * stagger + 0.32)
-                        let q = CGFloat(outBack(e, 2.4))
+                        let q = CGFloat(outBack(e, 1.8))
                         let wc = x0 + (wordMin[gl.word] + wordMax[gl.word]) / 2
                         dx = (x0 + gl.x + gl.advance / 2 - wc) * (q - 1)
                         sc = q; a = CGFloat(min(1, e * 4))
@@ -186,7 +254,7 @@ struct Kinetic {
                         if o > 0 {
                             ctx.saveGState()
                             ctx.translateBy(x: x0 + gl.x, y: baseline + dy); ctx.scaleBy(x: 1, y: -1)
-                            ctx.setAlpha(CGFloat(o) * visible); stroke(gl.path, colour, max(2, s * 0.025))
+                            ctx.setAlpha(CGFloat(o) * visible); stroke(gl.path, tint(gl, li), max(2, s * 0.025))
                             ctx.restoreGState()
                         }
                         a = CGFloat(prog(lt, 0.45, 0.8))
@@ -203,7 +271,7 @@ struct Kinetic {
                         rot += CGFloat(gone) * CGFloat(r.next() - 0.5) * 6; a *= CGFloat(1 - gone)
                     default: break
                     }
-                    drawGlyph(gl, x0 + gl.x + dx, baseline, colour, scale: sc, rotate: rot, dy: dy, alpha: a * visible)
+                    drawGlyph(gl, x0 + gl.x + dx, baseline, tint(gl, li), scale: sc, rotate: rot, dy: dy, alpha: a * visible)
                     letter += 1
                 }
             }
@@ -218,6 +286,7 @@ struct Kinetic {
         let lastLine = Double(max(0, set.count - 1)) * stagger
         let reveal: Double
         switch enter {
+        case .none: reveal = 0
         case .rise, .wave: reveal = lastLine + 0.36
         case .fade: reveal = lastLine + 0.3
         case .pop: reveal = Double(max(0, words - 1)) * stagger + 0.32
@@ -231,9 +300,12 @@ struct Kinetic {
         case .highlight: reveal = lastLine + 0.5
         case .outlineFill: reveal = 0.8
         }
+        noteDrawn(content.joined(separator: " "), size: s, rect: CGRect(x: blockLeft, y: blockTop, width: blockW, height: blockH),
+                  settled: lt >= reveal && gone == 0, align: align, headline: true)
         if lt >= reveal && gone == 0 {
             noteText(content.joined(separator: " "), size: s,
-                     rect: CGRect(x: blockLeft, y: blockTop, width: blockW, height: blockH))
+                     rect: CGRect(x: blockLeft, y: blockTop, width: blockW, height: blockH),
+                     colours: [colour] + parsed.flatMap { $0.compactMap { $0.style?.colour } })
         }
     }
 }
@@ -247,7 +319,7 @@ func rollNumber(_ final: String, p: Double, x: CGFloat, y: CGFloat, size: CGFloa
     textLog?.muted += 1
     defer {
         textLog?.muted -= 1
-        if p >= 1 { noteText(final, size: size, rect: CGRect(x: x - textWidth(final, size, face, kern: kern) * align, y: y - size * 0.8, width: textWidth(final, size, face, kern: kern), height: size)) }
+        if p >= 1 { noteText(final, size: size, rect: CGRect(x: x - textWidth(final, size, face, kern: kern) * align, y: y - size * 0.8, width: textWidth(final, size, face, kern: kern), height: size), colours: [colour]) }
     }
     let cell = textWidth("0", size, face, kern: kern)
     let chars = Array(final)

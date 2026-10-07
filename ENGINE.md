@@ -18,12 +18,15 @@ The engine is plain Swift on Apple's built-in frameworks (Core Graphics, Core Te
 | `sheet` | `out/sheet.png`: labelled stills on one sheet, for critique: the whole film plus the edges and middle of every join. `sheet 0.5 3 7.5 …` picks the times |
 | `stills 3 7.5` | `out/stills/still-3.00.png`… at full size |
 | `audio` | `out/music.m4a` + `out/beats.json`, and prints levels |
-| `check` | Readability: every line of text that leaves before it can be read (15 characters/s + 0.4 s, at least 1 s, after its entrance finishes), text in the social apps' button zones, dead air, and flashing (more than three flashes a second fails). It also reports what frame 1 says and whether the shot lengths vary |
+| `check` | Readability: every line of text that leaves before it can be read (15 characters/s + 0.4 s, at least 1 s, after its entrance finishes), text in the social apps' button zones, contrast, dead air, and flashing (more than three flashes a second fails). **Layout audit:** text overlapping text, text cut off by the frame or its card, crops slicing through UI (✗); text crossing during a see-through join, text covered by something, cameras cropping UI at rest, large empty stretches, uneven headline margins (⚠). It also reports what frame 1 says and whether the shot lengths vary |
+| `storyboard` | `out/storyboard.png`: each beat's settled keyframe (`Film(keyframes:)`, or each scene's end), large, each audited on its own. Lay the film out and pass this before animating |
 | `draft` | `out/<name>-draft.mp4`: half size at 30 fps, about 3× faster, for your own review |
 | `video` | `out/<name>.mp4` (H.264 + AAC). About 20–45 s for 30 s at 60 fps |
 | `video effects` | `out/<name>-effects.mp4`: the sound effects only, where they sit in the full mix, so a platform sound or a licensed track can go on top |
 
 `bash ROOT/scripts/compare.sh <film>` checks how much the film *sounds* like the other films in the studio (harmony, timbre, groove; above 0.85 is too similar).
+
+`bash ROOT/scripts/footage.sh <video> [sheet <s> … | frame <s> <out.png> | trim <from> <to> <out>]` reads a screen recording: its size and length, a timeline of where and when the screen changes (taps, typing, new screens, still stretches), contact sheets of chosen moments, a full-size frame to measure, and trims that keep full quality.
 
 `bash ROOT/scripts/inspect.sh <image> [pixel X,Y … | row Y | column X | find RRGGBB]` measures a screenshot: its size and colours, the edges of elements along a row or column, and the bounding boxes of everything in one colour (a ring, a bar, a badge). Use it before redrawing a tick, a counter or a bar on top of real UI.
 
@@ -32,9 +35,11 @@ The engine is plain Swift on Apple's built-in frameworks (Core Graphics, Core Te
 ```swift
 func makeFilm() -> Film {
     Film(name: "acme-hype", width: 1080, height: 1920, fps: 60, duration: 30, bpm: T.bpm,
-         holdFrom: T.hold, draw: frame, score: score)
+         holdFrom: T.hold, draw: frame, score: score, keyframes: [2.6, 7.5, 13.0, 29.0])   // tempo: phases (optional)
 }
 ```
+
+`keyframes` are the moments each beat is fully laid out (from SCRIPT.md); `storyboard` renders and audits them.
 
 - `draw(t)` paints the frame at time `t` into the global `ctx` (top-left origin, pixels). `W` and `H` are the canvas size.
 - The engine clears the frame first and adds film grain after; the grain freezes from `holdFrom`.
@@ -53,7 +58,7 @@ func makeFilm() -> Film {
 
 ## Faces and type
 
-`Face.named("Futura-CondensedExtraBold")` · `Face.system(.heavy)` · `Face.system(.bold, .rounded)` (also `.serif` = New York, `.monospaced`). Brand fonts in `assets/fonts/` register on their own; use their PostScript name. Unknown names fall back to the system font, with a warning.
+`Face.named("Futura-CondensedExtraBold")` · `Face.system(.heavy)` · `Face.system(.bold, .rounded)` (also `.serif` = New York, `.monospaced`) · `.italic` on any of them (`Face.system(.regular, .serif).italic`, `Face.named("Didot").italic`): the family's real italic when it has one, otherwise a gentle slant. Brand fonts in `assets/fonts/` register on their own; use their PostScript name. Unknown names fall back to the system font, with a warning.
 
 **Faces that ship on every Mac**, by personality:
 - Condensed and loud: `Futura-CondensedExtraBold`, `DINCondensed-Bold`, `Impact`, `AvenirNextCondensed-Heavy`, `HelveticaNeue-CondensedBlack`
@@ -69,7 +74,8 @@ func makeFilm() -> Film {
 | `text(s, size, face, col, x, baseline, align:, kern:)` → width | One line (`align` 0 left, 0.5 centre, 1 right). The older `text(s, size, .heavy, …)` with an SF weight still works |
 | `textWidth(s, size, face)`, `outlineText(…, width:)` | Measure; outline only |
 | `Kinetic(lines:, face:, size:, colour:, x:, y:, from:, to:, enter:, exit:, align:, lineHeight:, kern:, maxWidth:, upper:, stagger:, seed:).draw(t)` | Kinetic type. Pass arguments **in this order**; omit any with defaults |
-| `TextIn` | `.rise` `.fade` `.pop` (per word) `.cascade` (per letter) `.typewriter(cps:)` `.slam` `.slide(Side)` `.stamp` `.scramble` `.split` `.wave` `.highlight(Col)` `.outlineFill` |
+| `TextIn` | `.none` `.rise` `.fade` `.pop` (per word) `.cascade` (per letter) `.typewriter(cps:)` `.slam` `.slide(Side)` `.stamp` `.scramble` `.split` `.wave` `.highlight(Col)` `.outlineFill` |
+| `Kinetic(…, accent: TextStyle(…), styles: ["name": TextStyle(…)])` | **Mixed type in one line.** `*words*` take the accent, `{name:words}` a named style: `TextStyle(face:, colour:, scale:, mark:, underline:)` changes the face (a serif italic, another weight), colour, size (0.5–1.6×), or adds a highlighter `mark` or an `underline`. Example: `Kinetic(lines: ["Make a list for *your son.*"], face: .system(.bold, .serif), …, accent: TextStyle(face: Face.system(.regular, .serif).italic, colour: green))` |
 | `TextOut` | `.none` `.rise` `.fade` `.drop` `.scatter` `.shrink` `.wipe(Side)` |
 | `rollNumber("$124.00", p:, x:, y:, size:, face:, colour:, align:)` | Slot-machine digits (nothing shows until p > 0) |
 | `marquee("TEXT", y:, height:, band:, ink:, face:, size:, speed:, t:, degrees:)` | A scrolling ticker band, optionally slanted |
@@ -89,6 +95,40 @@ The older `Headline` + `drawHeadlines` and `stampScale`, `riseText` still work.
 | `screensRow([s1, s2, s3], in:, gap:, p:, vertical:)` | Screens side by side (or stacked), entering in turn |
 | `screensFan([s1, s2, s3], centre:, height:, spread:, p:)` | Flat fanned screens (2D, never tilted like a device photo) |
 | `canvasPoint(p, region:, drawnIn:)` | A screenshot pixel → canvas point (for taps, stickers, arrows); measure the pixel with `scripts/inspect.sh` |
+
+## Entrances and exits for anything
+
+`show(rect, t: t, from: start, until: end, enter: .slide(.left), exit: .fade, length: 0.45) { … }` draws whatever is in the braces (an image, a screen, a card, a sticker, an illustration, a whole text block) entering at `from` and leaving by `until` (optional). Nested `show` calls combine, and text inside isn't counted as readable while it moves.
+
+`Appear`: `.cut` `.fade` `.pop` `.zoom` `.rise` `.drop` `.slide(Side)` `.fly(Side)` `.wipe(Side)` `.iris` `.blur` `.flip` `.spin`.
+- **Big things** (screens, cards, photos, headlines as blocks): `zoom`, `fade`, `rise`, `slide`, `fly`, `wipe`, `iris`, `blur`. They ease without bounce.
+- **Small things** (stickers, icons, chips, avatars): `pop`, `drop`, `flip`, `spin` may overshoot a little.
+- For a slide or fly, the side is where it waits while hidden: it comes in from there and leaves toward it.
+- Stagger a group by offsetting `from` (`T.cards + Double(i) * 0.08`).
+
+## Footage: the app working
+
+Real screen recordings (a Simulator capture, QuickTime, a phone recording; .mov or .mp4) show the app doing things, which is what admired launch films have in common. Read one with `footage.sh` first: its timeline says when and where the screen changes, and `sheet` shows the moments.
+
+| Call | Does |
+|---|---|
+| `let rec = Footage("assets/demo.mp4")` | Opens a recording. `.size`, `.bounds` and `.duration` are in its pixels and seconds |
+| `Playback([(filmT, recS), …])` → `.at(t)` | Film time → recording time: between keys it runs at whatever speed gets from one moment to the next (speed ramps ease); equal moments freeze; it never rewinds. `ramps: false` keeps each segment at constant speed. Keys need distinct film times and nondecreasing recording times. `.filmTime(of: s)` finds when a recorded event first plays, for a sound or a ripple; it returns infinity if a final freeze never reaches the event |
+| `Zoom([(t, region), …])` → `.region(t)` | A camera inside the recording: regions in its pixels, eased between, zooming geometrically. Keep regions in the card's proportions |
+| `drawFootage(rec, at: play.at(t), region: zoom.region(t), in: card, cover: true, radius:)` → rect | Draws that moment like a screenshot. `cover: true` keeps the card still while the camera moves inside it |
+| `footageRegion(rec, region, card)` + `canvasPoint` | A recording pixel → canvas point under the current camera (for fingers, ticks and callouts) |
+
+Trim long recordings into `assets/` with `footage.sh <video> trim <from> <to> assets/<name>.mp4`. Speed through waits (3–5×), keep typing at most about 2.5× so the words read, and freeze on each result. To capture a Simulator: `xcrun simctl io booted recordVideo --codec=h264 <file>.mov` (stop it with Ctrl-C); set the status bar with `xcrun simctl status_bar booted override --time 9:41`.
+
+## UI acting
+
+Perform the app's real interactions on its screens, to make stills feel alive or to point at what footage is doing. Act out only what the app really does.
+
+| Call | Does |
+|---|---|
+| `typeIn("Pack gym clothes", t: t, from: T.type, cps: 12, at: baseline, size:, face:, colour:, caret:, clear:, clearColour:)` | Types into a field with a human rhythm and a caret (solid while typing, blinking idle). `clear` paints the field first. `typingEnds(…)` says when it finishes |
+| `TouchPath([(t, point), …], taps: [t…], style: .finger / .arrow).draw(t, map:)` | A finger (like the Simulator's touch indicator) or a cursor moving smoothly and tapping with a squish and a ripple. `map` converts recording pixels to the canvas under a moving camera |
+| `changeState(t: t, at: t0, style: .crossfade / .push(Side) / .reveal(point) / .cut, in: card, before: { … }, after: { … })` | A screen going to its next state: an iOS navigation push, a reveal from the tapped point, or a crossfade |
 
 ## Joins (transitions)
 
@@ -173,6 +213,10 @@ s.compose(recipe, [Section(from: 0, to: 2.3, energy: 1), Section(from: 2.3, to: 
 - **Sections:** energy 0 ambient · 1 light · 2 groove · 3 full. Rises get fills, risers and crashes on their own (`fill: false` swells in softly instead); `muffled: true` makes a stretch sound underwater.
 - **Space:** `.dry` `.room` `.studio` `.hall` `.cathedral`.
 - **Colour:** `.clean` `.warm` `.tape` `.lofi` `.bright` `.crushed`.
+
+**Tempo phases** (only when the story asks for it; most films keep one tempo):
+- **Feel:** `Section(…, feel: .half)` plays the groove at half speed on the same grid: slower and heavier while every cut stays on the beat (tension under a problem, then the full groove at the reveal). `.double` makes the drums twice as busy.
+- **A tempo map:** `let phases = TempoMap(120, [.at(beat: 16, bpm: 96, via: .hitStop), .ramp(from: 40, to: 48, bpm: 132)])`, passed as `Film(…, tempo: phases)`, and the film's grid becomes `static func b(_ n: Double) -> Double { phases.time(ofBeat: n) }`. Ways into a new tempo: `.cut`, `.tapeStop` (the music slows to a halt), `.hitStop` (a stab, then a beat of silence), `.riser`. `.ramp` glides (speeding into a drop, slowing into the end). `beatPulse(t)` follows the map.
 
 **Beyond the recipe:**
 - `s.cue(t, "what", sound, gain, pan:)` puts a sound effect on a picture event.

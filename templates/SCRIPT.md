@@ -16,3 +16,5 @@
 ## Claims to verify before posting
 
 - [ ] <!-- every feature claim above, with where it's proven (code, docs, store page) -->
+
+**Frames.** For each beat, note its settled moment (it goes into `Film(keyframes:)`) and its composition: the focal point, where the words sit, what fills the rest. `run.sh <film> storyboard` renders and audits exactly these frames.

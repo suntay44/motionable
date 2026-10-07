@@ -76,6 +76,7 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 |---|---|
 | **Energy and pacing** | 1 calm … 5 relentless; shots of 2–7 s with 2–4 moves inside each, of varied lengths; where it peaks |
 | **Tempo and feel** | 70–150 BPM; straight, swing (0.1–0.5), half-time, or 3/4 (a waltz or lullaby: `meter: 12`). Match the product's pace, not a habit |
+| **Tempo phases** *(optional)* | Most films keep one tempo. Change it only when the story moves that way and the user's brief allows it: a half-time groove under the problem, then the full groove at the reveal (`feel: .half`); a tape stop or a hit and a beat of silence into a new tempo; a ramp speeding into the drop or slowing into the end. Say why, from the evidence ("calm products stay steady") |
 | **Key and mode** | Any key. Major or lydian: open, bright. Mixolydian or dorian: groovy, cool, confident. Minor or phrygian: tense, dramatic. Pentatonic or blues: playful, soulful. Harmonic minor: exotic, cinematic |
 | **Harmony colour** | Triads (plain, punchy), 7ths and 9ths (warm, jazzy, lo-fi), sus (airy), power (hard). Progression of your choosing |
 | **Drum language** | Write the real patterns (16 steps a bar; 12 in 3/4). A soft entrance (`fill: false`) skips the fill and crash. Four-on-the-floor, breakbeat, boom-bap swing, half-time trap, Latin clave, funk with ghost notes, shuffle, a cinematic pulse, or no drums at all. Bring in the product's world (knife chops as the hi-hat, pen clicks as the rim) |
@@ -84,7 +85,10 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 | **Signature sounds** | 2–4 effects from the product's world (sizzle, ka-ching, page flip, shutter, pen, coins, boing, bubbles, glitch…) for its key moments |
 | **Palette use** | Which brand colour leads and when; backgrounds (solid, gradient, paper, dark, pattern); one accent for emphasis |
 | **Type** | The product's own font if its file is available; otherwise a macOS face that matches its type personality (see ENGINE.md › Faces). Choose case, alignment, scale, **at least 2 entrance styles**, and an exit |
-| **Framing** | **At least 3** of: a whole screen, a snapped focus, a camera move inside a screen, a lifted callout, a row of screens, a fan of screens, a redrawn UI element, an illustration |
+| **Type mix** | How faces and weights combine, read from the product's voice: one face in two weights (black + ultralight: modern, precise), a heavy sans with a serif italic for the emotional word (editorial, warm), a rounded face with a slant (soft, friendly), a condensed caps line over a light line (bold, sporty). At most 3 faces in a film; the mix goes on 1–2 words a line (`*accent*`, `{name:words}`), never whole paragraphs |
+| **Colour mix** | Which words get which colours: the base text colour plus 1–2 accents from the brand palette, with a job each (numbers, the benefit word, the product's name). Highlighter marks or underlines only if the brand already uses them. Every line keeps 3:1 contrast with what's behind it (`check` measures it) |
+| **Motion vocabulary** | How things enter and leave, the same way through the whole film: 3–5 motions from ENGINE.md › Entrances (`show`: pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip, spin) plus the text entrances. Calm products: fade, rise, zoom, wipe. Playful: pop, drop, flip, spin on small things. Crisp: slide, fly, wipe. Each kind of thing moves one way (screens one way, stickers another), so the motion reads as a language, not a sampler |
+| **Framing** | **At least 3** of: **footage of the app working (a recording, with a camera moving inside it)**, a whole screen, a snapped focus, a camera move inside a screen, a lifted callout, a row of screens, a fan of screens, a redrawn UI element with UI acting (typing, a finger, a state change), an illustration. If a recording exists, the signature moment uses it |
 | **Transitions** | A different kind at each boundary (≥3 kinds in 30 s, ≥2 in 15 s), each with a reason, matched to energy and personality: calm (dissolve, iris, morph, blob, dip, an in-shot colour shift), crisp (push, cover, uncover, columns, blinds), energetic (whip, zoom-through, slice, flash, glitch, pixelate), warm and analogue (burn) |
 | **Camera** | Locked, slow push, glide inside screens, beat pulse, shake on impacts, handheld |
 | **Texture** | None, grain, paper, scanlines, halftone, light leaks, vignette, bloom, letterbox |
@@ -98,7 +102,7 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 2. **Differ.** This film must differ from **every** other film on at least **5** fingerprint lines:
    - a tempo more than 12 BPM apart;
    - a different mode;
-   - a different drum language, lead instrument, colour, type face, hook device or end-card device;
+   - a different drum language, lead instrument, colour, type face, type mix, motion vocabulary, hook device or end-card device;
    - at most 2 shared transition kinds.
 
    If it collides, change dials. Change them for reasons, not at random, and keep the product's truth.
@@ -121,6 +125,16 @@ Ask whether Claude should **draw illustrations for this film**. Recommend it whe
 - **Never redraw** the user's logo, mascot or real UI. Use their files.
 - **Never imitate** another brand's characters or artwork.
 
+## 5b. Compose every frame
+
+Before a scene is animated, its settled frame has to work as a still picture. For each beat decide:
+- **The focal point:** one thing the eye goes to (usually the product's UI or the number), and where it sits.
+- **Where the words go**, in the format's safe band, on a margin the whole film shares.
+- **What fills the rest:** the product, a visual from its world, or deliberate space. Nothing empty by accident, nothing touching an edge by accident, no crop through UI.
+- **How it hands over** to the next beat: new text arrives after a see-through join, not during it.
+
+These go in SCRIPT.md per beat, and the beats' settled moments become the film's `keyframes`.
+
 ## 6. Write it down
 
 - **DIRECTION.md** from `templates/DIRECTION.md`: board, personality, story, every dial with its reason, the recipe, the look, illustrations, end card, and the fingerprint.
@@ -130,5 +144,5 @@ Then show the user a **4-line treatment** and the compact grid, for one approval
 
 > **Feel:** confident kitchen funk — warm, cheeky, never fussy
 > **Sound:** 104 BPM D dorian funk, slap bass, brass stabs, cowbell; chops on the cuts, a ka-ching when costs land
-> **Look:** Ponda red and cream, condensed caps popping word by word; knife-slice and whip transitions; whole screens and a lifted price card
+> **Look:** Ponda red and cream; condensed caps popping word by word, prices in a bigger yellow; knife-slice and whip transitions; screens fly in, stickers pop; a lifted price card
 > **Signature moment:** servings roll 4 → 40 while the total spins up like a slot machine

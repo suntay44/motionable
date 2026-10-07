@@ -35,6 +35,7 @@
 |---|---|---|
 | Energy & pacing | | |
 | Tempo & feel | | |
+| Tempo phases (none · half-time stretch · new tempo via tape stop / hit stop / riser · ramp) | | |
 | Key & mode | | |
 | Harmony colour & progression | | |
 | Drum language | | |
@@ -43,8 +44,11 @@
 | Signature sounds | | |
 | Palette use | | |
 | Type (face, case, entrances, exit) | | |
+| Type mix (≤3 faces; which words) | | |
+| Colour mix (base + accents; each accent's job) | | |
+| Motion vocabulary (how screens, cards, small things and text enter and leave) | | |
 | Framing (≥3) | | |
-| Transitions (≥4 kinds) | | |
+| Transitions (≥3 kinds in 30 s, ≥2 in 15 s) | | |
 | Camera | | |
 | Texture | | |
 | Elements (+ custom) | | |
@@ -74,6 +78,8 @@ Sections: <!-- [from–to energy] … -->
 - lead instrument:
 - colour:
 - type face:
+- type mix:
+- motion vocabulary:
 - hook device:
 - transitions:
 - end card:
