@@ -10,7 +10,7 @@ You arrive here with facts about a product (each with a source), the user's answ
 
 `ROOT` is the motionable root: `${CLAUDE_PLUGIN_ROOT}`. If that isn't expanded, use the folder two levels above this file's real path (`realpath`), which holds `engine/` and `scripts/`.
 
-Read **`ROOT/PLAN.md`** (plan mode), **`ROOT/ENGINE.md`** (the ingredients), **`ROOT/rules.md`** (hard rules) and **`ROOT/checklist.md`** (critique) before you plan. `ROOT/examples/owly/` shows what finished work looks like. **Use its implementation as an example, and derive the new film's look, sound and structure from its own evidence; do not copy them**: it is one direction among endless ones.
+Read **`ROOT/PLAN.md`** (plan mode), **`ROOT/ENGINE.md`** (the ingredients), **`ROOT/rules.md`** (hard rules), **`ROOT/checklist.md`** (critique) and **`ROOT/docs/motion-craft.md`** (story-led typography, continuity and motion) before you plan. `ROOT/examples/owly/` shows what finished work looks like. **Use its implementation as an example, and derive the new film's look, sound and structure from its own evidence; do not copy them**: it is one direction among endless ones.
 
 If voiceover was selected, also read **`ROOT/docs/voiceover.md`**. Carry its script, audition, saved-take and mixing steps through this pipeline. With no voice, do not load or set up speech tools.
 
@@ -30,7 +30,7 @@ Follow **PLAN.md** from start to finish:
 2. **Story:** promise, signature moment, 3 hooks → 1.
 3. **Every dial set, each with its reason.**
 4. **Uniqueness against the studio:** read the other films' `DIRECTION.md` › Fingerprint. When a film has no fingerprint, inspect its scene/score source or mark the choices unknown; never invent its tempo, palette or structure from its age.
-5. **Write DIRECTION.md and SCRIPT.md** with the artwork specification, action/settle/hold timing and element handoffs from `docs/motion-craft.md`.
+5. **Write DIRECTION.md and SCRIPT.md** with a stable type hierarchy, a visual thread where useful, sequential information, before/action/result timing and sound anchors from `docs/motion-craft.md`. Match a user-selected reference by these relationships, not by adding more effects.
 
 Do not ask the user to pick a style. The direction comes from the evidence.
 
@@ -50,7 +50,7 @@ Write no scene code before approval. A change here is cheap. For narration, incl
 2. **Storyboard first.** Lay every scene out at its settled state before any motion: every element at its final place. Set `keyframes:` to each beat's settled moment (SCRIPT.md), run `bash ROOT/scripts/run.sh <film> storyboard`, fix every ✗ (overlaps, cut-off text, crops through UI, contrast, safe zones), and judge each keyframe as a still: one focal point, a shared margin, nothing empty or touching an edge by accident (PLAN.md › 5b). Then animate.
 3. **`scenes/Film.swift`:** replace the skeleton completely. Every value comes from DIRECTION.md and SCRIPT.md:
    - the times go into `enum T`;
-   - clips and joins go into a `Reel`;
+   - use `Reel` for shot boundaries where needed; draw a continuous visual carrier once outside scene crossfades, directly in the frame or through `SharedElement`, so it retains its identity;
    - screens go through the framing calls (never clipped into a fixed box);
    - **if there's a recording of the signature moment, use it** (ENGINE.md › Footage): trim it into `assets/` with `footage.sh … trim`, map film time to it with `Playback` (through waits fast, typing at most about 2.5×, freezing on results), move a `Zoom` camera to where its timeline says the change happens, and put fingers on its taps with `TouchPath`. Sounds go on recorded events through `play.filmTime(of:)`;
    - otherwise the signature moment is redrawn to animate exactly like the real UI, with UI acting (typing, a finger, a state change). Measure where it sits first: `bash ROOT/scripts/inspect.sh <screenshot> find <its colour>` (or `row`, `column`, `pixel`) gives exact rings, bars and text edges.
@@ -67,7 +67,7 @@ Work in drafts, and never loop endlessly:
 2. **Self-review: one pass, and every check.**
    - `run.sh <film> check`: every ✗ is a must-fix. Hold the line longer, start it sooner, cut words, or drop the line. A typed line needs its typing time *plus* its reading time. Every layout ✗ too: overlapping text, cut-off text, a crop through UI. Act on its ⚠ advice (frame 1, rhythm, empty stretches, text crossing in a join, covered text, a camera cropping UI) unless DIRECTION.md says why not.
    - `run.sh <film> storyboard` again: every keyframe ✓.
-   - `run.sh <film> sheet`: score every category in checklist.md, and fix anything below 8. Look at full-size `stills` of the hook, the signature moment and the end card: is the UI legible, does anything collide, is every corner of the frame doing something or deliberately empty?
+   - `run.sh <film> sheet`: score every category in checklist.md, and fix anything below 8. Look at full-size `stills` of the hook, the signature moment and the end card: is the UI legible, is the headline hierarchy consistent, does anything collide, and does each supporting element explain or direct attention?
    - **What viewers punish** (RESEARCH.md › community check): UI too small to read, distracting overshoot, mechanical timing, stock-sounding music, a slow logo moment.
    - `run.sh <film> audio`, then `bash ROOT/scripts/compare.sh <film>`: review any high similarity result; change unintended reuse for a reason, or document intentional series reuse.
    - Review the draft at normal speed and inspect the dense motion sequences. Look for abrupt acceleration, identity changes across joins, competing actions, insufficient pauses, and text arriving too late. Record timestamps and distinguish observed playback from static inspection; if playback or audio cannot be assessed, report that limitation.

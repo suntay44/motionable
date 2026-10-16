@@ -97,8 +97,11 @@ func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = 
     defer { renderFPS = savedFPS }
     let outW = Int(CGFloat(film.width) * scale) / 2 * 2, outH = Int(CGFloat(film.height) * scale) / 2 * 2
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    let silent = dir.appendingPathComponent(".video-only.mp4"), out = dir.appendingPathComponent("\(film.name)\(draft ? "-draft" : "")\(suffix).mp4")
-    for u in [silent, out] { try? FileManager.default.removeItem(at: u) }
+    let renderID = UUID().uuidString
+    let silent = dir.appendingPathComponent(".video-\(renderID).mp4")
+    let pending = dir.appendingPathComponent(".export-\(renderID).mp4")
+    let out = dir.appendingPathComponent("\(film.name)\(draft ? "-draft" : "")\(suffix).mp4")
+    defer { try? FileManager.default.removeItem(at: silent); try? FileManager.default.removeItem(at: pending) }
     let writer = try AVAssetWriter(outputURL: silent, fileType: .mp4)
     let pixels = Double(outW * outH)
     let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
@@ -113,15 +116,22 @@ func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = 
     let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
         kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
         kCVPixelBufferWidthKey as String: outW, kCVPixelBufferHeightKey as String: outH])
+    guard writer.canAdd(input) else { throw NSError(domain: "motionable", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unsupported video settings"]) }
     writer.add(input)
-    writer.startWriting()
+    guard writer.startWriting() else { throw writer.error ?? NSError(domain: "motionable", code: 3) }
+    defer { if writer.status == .writing { writer.cancelWriting() } }
     writer.startSession(atSourceTime: .zero)
     let frames = Int((film.duration * Double(fps)).rounded())
     for f in 0..<frames {
-        while !input.isReadyForMoreMediaData { usleep(2000) }
+        while !input.isReadyForMoreMediaData {
+            guard writer.status == .writing else { throw writer.error ?? NSError(domain: "motionable", code: 4) }
+            usleep(2000)
+        }
         var pb: CVPixelBuffer?
-        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &pb)
-        let buffer = pb!
+        guard let pool = adaptor.pixelBufferPool,
+              CVPixelBufferPoolCreatePixelBuffer(nil, pool, &pb) == kCVReturnSuccess, let buffer = pb else {
+            throw NSError(domain: "motionable", code: 5, userInfo: [NSLocalizedDescriptionKey: "Unable to allocate a video frame"])
+        }
         CVPixelBufferLockBaseAddress(buffer, [])
         let c = CGContext(data: CVPixelBufferGetBaseAddress(buffer), width: outW, height: outH, bitsPerComponent: 8,
                           bytesPerRow: CVPixelBufferGetBytesPerRow(buffer), space: srgb,
@@ -131,7 +141,9 @@ func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = 
         deviceScale = scale
         drawFrame(Double(f) / Double(fps), frame: f)
         CVPixelBufferUnlockBaseAddress(buffer, [])
-        adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(f), timescale: CMTimeScale(fps)))
+        guard adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(f), timescale: CMTimeScale(fps))) else {
+            throw writer.error ?? NSError(domain: "motionable", code: 6)
+        }
         if f % (fps * 5) == 0 { print("frame \(f)/\(frames)") }
     }
     input.markAsFinished()
@@ -140,7 +152,10 @@ func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = 
 
     let comp = AVMutableComposition()
     let v = AVURLAsset(url: silent), a = AVURLAsset(url: audio)
-    let vt = try await v.loadTracks(withMediaType: .video)[0], at = try await a.loadTracks(withMediaType: .audio)[0]
+    guard let vt = try await v.loadTracks(withMediaType: .video).first,
+          let at = try await a.loadTracks(withMediaType: .audio).first else {
+        throw NSError(domain: "motionable", code: 7, userInfo: [NSLocalizedDescriptionKey: "Export requires video and audio tracks"])
+    }
     let aDur = try await a.load(.duration)
     let full = CMTime(value: CMTimeValue(frames), timescale: CMTimeScale(fps))
     try comp.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)!
@@ -148,7 +163,11 @@ func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = 
     try comp.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)!
         .insertTimeRange(CMTimeRange(start: .zero, duration: CMTimeMinimum(full, aDur)), of: at, at: .zero)
     let ex = AVAssetExportSession(asset: comp, presetName: AVAssetExportPresetPassthrough)!
-    try await ex.export(to: out, as: .mp4)
-    try? FileManager.default.removeItem(at: silent)
+    try await ex.export(to: pending, as: .mp4)
+    if FileManager.default.fileExists(atPath: out.path) {
+        _ = try FileManager.default.replaceItemAt(out, withItemAt: pending)
+    } else {
+        try FileManager.default.moveItem(at: pending, to: out)
+    }
     return out
 }

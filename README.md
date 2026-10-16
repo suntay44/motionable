@@ -6,7 +6,7 @@
 **Product launch videos with real app assets, directed motion and original music**
 
 **Hype videos for your product, drawn in code on your Mac.**
-A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders a ready-to-post MP4.
+A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders an editable MP4.
 
 Free · open source · macOS only · no extra setup for music-only films
 
@@ -20,11 +20,12 @@ Free · open source · macOS only · no extra setup for music-only films
 <br />
 </div>
 
-**motionable** is a free, open-source [Claude Code](https://claude.com/claude-code) plugin that turns your app's repo, your website or a few screenshots into a **15–30 second hype video**: a launch video, an app promo or a social ad. It plans the film from your product's personality, composes original music, checks that every line can be read, and renders the MP4 with Swift on your Mac. You don't need After Effects, Remotion, ffmpeg or a subscription.
+**motionable** is a free, open-source [Claude Code](https://claude.com/claude-code) plugin that turns your app's repo, your website or a few screenshots into a **15–30 second hype video**: a launch video, an app promo or a social ad. It plans the film from your product's personality, composes original music, audits text timing and layout, and renders the MP4 with Swift on your Mac. Visual quality and sound still need human review. You don't need After Effects, Remotion, ffmpeg or a subscription.
 
 ## Contents
 
 - [Demo](#demo)
+- [Energetic launch series](#energetic-launch-series)
 - [Install](#install)
 - [How to use it](#how-to-use-it)
 - [Scenarios](#scenarios)
@@ -38,6 +39,18 @@ Free · open source · macOS only · no extra setup for music-only films
 - [Licence](#licence)
 
 ## Demo
+
+### Owly — original visual direction
+
+<img src="docs/demos/owly-original.gif" width="270" alt="Original Owly film: Mom wrote it, son did it; one card transforms from a list into a widget, family circles, a capacity bar and the app icon">
+
+**[Watch with sound](docs/demos/owly-original.mp4)** · 9:16 · 30 seconds · original code-composed score at 120 BPM
+
+One card carries the story from a list to a widget, family circles, a capacity bar and the app icon. Consistent headlines, sequential product explanation and musical payoffs keep the story connected. See [the five principles](docs/motion-craft.md#story-led-motion-five-principles) and [the original example source](examples/owly).
+
+This authored film is the original reference from which Motionable grew. It predates the modern audit, and its release wording reflects its original production date. New generated films still need visual and listening review.
+
+### More product examples
 
 Three films for three real apps, each made from its repo with `/motionable:project`. Each has its own format, music and look:
 
@@ -77,7 +90,7 @@ In Claude Code:
 /plugin install motionable@motionable
 ```
 
-In the desktop app: **+ → Plugins → Add plugin**, then enter `suntay44/motionable`.
+For Claude desktop, follow the current [plugin installation instructions](https://code.claude.com/docs/en/discover-plugins#install-a-plugin); interface and custom-marketplace availability can vary. The CLI commands above are the repository’s documented installation route.
 
 To update later, run `claude plugin marketplace update motionable`, then `claude plugin update motionable@motionable`.
 
@@ -102,11 +115,11 @@ mkdir ~/HypeVideos && cd ~/HypeVideos && claude
 **4. Approve the plan.** You see a 4-line treatment (feel, sound, look, signature moment) and the beat grid. You also choose whether Claude should draw illustrations for the film.
 
 **5. Get the film.** Claude builds a first draft and reviews it itself, then fixes it in a second draft. It checks:
-- that every line stays on screen long enough to read;
+- text timing against a reading-time heuristic;
 - that nothing sits under the apps' buttons;
 - that the first frame reads;
 - that nothing flashes too fast;
-- that the music doesn't sound like your other films.
+- measured soundtrack similarity to your other films (a listening aid, not a quality verdict).
 
 Then it renders the MP4 and asks 3–4 short questions about pacing, sound, hook and ending, and revises once per round of answers. It doesn't loop forever.
 
@@ -181,15 +194,15 @@ the hook is too slow; open on the widget instead
 - **The app working:** give it a screen recording (from the Simulator, QuickTime or your phone) and it plays the real app: speeding through waits, zooming in where things happen, freezing on results, with a finger on every tap. No recording? It acts out the app on screenshots: typing with a caret, taps, screens changing.
 - **Directed, not templated:** no style presets. Plan mode sets about 16 dials from your product's evidence (tempo, key, drums, instruments, type, framing, transitions…). A fingerprint and sound comparison help identify accidental reuse while preserving deliberate visual continuity.
 - **Type with character:** a film can mix faces, weights, italics, sizes and colours word by word, like a serif italic for the feeling phrase, bigger numbers, or a key word in the brand colour. Each accent has a job, and every line's contrast is measured.
-- **Motion for everything:** text has 13 entrances. Images, screens, cards and stickers can pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip or spin in and out. Each film picks one motion vocabulary to match its feel.
+- **Motion that explains:** stable headline hierarchy, a visual thread where useful, sequential information and musical anchors. The engine supplies entrances, paths and transformations; the direction chooses what helps the viewer understand the product.
 - **Choreographed motion:** adjustable easing and finite springs, paths with shared velocities, persistent elements between layouts, and optional temporal blur for selected artwork. Reading pauses and stillness are part of the plan.
 - **Moving-sequence review:** `motion` renders a draft and dense sequences around actions and joins. Automated checks measure specific faults; professional quality still needs visual playback review.
-- **Original music:** composed in code for each film, in any tempo, key, groove or meter (even a 3/4 lullaby), and synced to every cut. There's nothing to license.
-- **Readable by design:** every line is held for its reading time and keeps 3:1 contrast with what's behind it. Key text stays clear of the Reels, TikTok and Shorts buttons, and screens are never sliced.
-- **Storyboarded, then audited:** every beat is laid out as a still and checked before anything moves. A layout audit then catches what a careful eye would: overlapping or cut-off text, crops through the UI, text covered by a finger or a card, empty stretches and uneven margins.
+- **Original music:** composed in code for each film, in any tempo, key, groove or meter (even a 3/4 lullaby), and synced to every cut. No stock music is bundled; supplied tracks, brand assets and optional voice models have their own licences.
+- **Readability audits:** checks estimate reading time, contrast, safe-zone placement and crop issues. The agent fixes reported faults and inspects playback; these heuristics do not guarantee comfortable reading or detect every visual problem.
+- **Storyboarded, then audited:** settle the composition before animating. Layout checks flag text overlap, cut-off text, crop edges, coverage, empty stretches and uneven margins; visual review remains necessary.
 - **Music with phases:** when the story wants it, the groove can drop to half-time under the problem and snap back at the reveal, change tempo through a tape stop or a beat of silence, or slow into the ending. The picture follows the same beat.
 - **Store-safe:** Apple's badge is never animated, and Google Play is shown only if you're on it.
-- **Fast:** a 30 s, 60 fps 1080p video renders in about 20–45 s.
+- **Local rendering:** render time depends on the Mac and effects. Recent 30-second 1080p/60 fps films took roughly one to four minutes after compilation; complex layers can take longer.
 
 ## Built on research
 
@@ -199,7 +212,7 @@ motionable's structure follows what the platforms, ad data and practitioners agr
 - **One message and 2–3 benefits**, each shown on real UI, big enough to read.
 - **The text carries the meaning, and the sound adds to it.** Every line gets its reading time.
 - **The brand appears early, woven in**, never as a logo slate. The end card has a true call to action.
-- **Calm craft:** smooth easing without bounce on big things, varied shot lengths, no stock-music formula, and no strobing (at most three flashes a second).
+- **Purposeful craft:** clear hierarchy, connected visual handoffs, measured settling, varied shot lengths and original sound, with no strobing (at most three flashes a second).
 
 ## FAQ
 
@@ -219,10 +232,10 @@ No. The Swift engine draws the film and composes the music. Optional generated n
 No. App Store previews must be footage captured from the app itself (App Review Guideline 2.3.4). Use motionable videos for social posts, ads, websites and launch posts. To make a preview, record the app instead, for example with `xcrun simctl io booted recordVideo`.
 
 **Is the music copyright-free?**
-It's composed in code for each film, so there's nothing to license. If you want a trending sound, render the effects-only version and add the sound in the app.
+The bundled score is synthesized from code rather than a stock recording. This is not a copyright guarantee. You remain responsible for rights to supplied recordings, tracks and brand assets; optional voice components have separate licences. See [licence details](#licence).
 
 **Will my videos all look the same?**
-No. There are no templates. Each film is directed from its product's own evidence (its sound, type mix, colours and motion), and it's checked against the other films in your studio.
+The workflow directs each film from its product’s evidence and supports deliberate series continuity. Results vary with the model and direction; the examples demonstrate possibilities, not guaranteed output quality.
 
 **Can I use my brand's fonts and colours?**
 Yes. Drop the font files into the film's `assets/fonts/` (if their licence allows it), or let it pick a matching macOS face. Colours come from your logo, screenshots or site, and accents are checked for contrast.
@@ -231,7 +244,7 @@ Yes. Drop the font files into the film's `assets/fonts/` (if their licence allow
 No. `/motionable:project` only reads the folder you point it at, and the film goes into your studio folder.
 
 **Can I edit the result?**
-Yes. Tell Claude what to change, or edit `SCRIPT.md`, `DIRECTION.md` or `scenes/Film.swift` yourself. A re-render takes under a minute.
+Yes. Tell Claude what to change, or edit `SCRIPT.md`, `DIRECTION.md` or `scenes/Film.swift` yourself. Render time varies with hardware and effects.
 
 **Which formats and lengths?**
 9:16, 16:9, 1:1 or any custom size, usually 15–30 s (up to 60 s).
@@ -255,25 +268,28 @@ for s in scratch website project make; do ln -s ~/.motionable/skills/$s ~/.agent
 
 ## Contributing
 
+The macOS test workflow runs on pushes to `main` and pull requests. It uses no voice-model download. To run the same checks locally, use the scripts below.
+
 - [PLAN.md](PLAN.md): plan mode.
 - [ENGINE.md](ENGINE.md): the ingredients.
 - [rules.md](rules.md): what every film follows.
 - [checklist.md](checklist.md): the self-critique.
 - [RESEARCH.md](RESEARCH.md): the evidence.
+- [docs/public-release-review.md](docs/public-release-review.md): review scope, verification and remaining limits.
 - `bash scripts/test-craft.sh`: renders the Owly craft benchmark, checks readability/layout, and decodes both video exports to verify dimensions, frame counts, timing, audio presence and the final hold.
-- `bash scripts/test.sh`: runs choreography, narration, engine and footage regressions, renders every element, entrance, look and transition once, verifies the layout audit, then checks every example film.
+- `bash scripts/test.sh`: checks scaffold escaping and preservation, render failure recovery, choreography, narration, engine and helper regressions, renders every element, entrance, look and transition once, verifies the layout audit, then checks every example film.
 - `bash scripts/regression.sh`: checks playback timing, sparse and rotated recordings, tempo maps, font caching and cut entrances with temporary fixtures.
 - `bash scripts/inspect.sh <screenshot> find <colour>`: measures UI for exact redraws.
 
 ## Licence
 
-MIT for the code and docs. The app screenshots, icons and mascots in `examples/*/assets/` belong to their apps and aren't covered by MIT ([details](examples/README.md)). Apple's badge artwork is never bundled; motionable asks before downloading it from Apple.
+MIT for Motionable’s original code and docs; third-party voice helpers retain their upstream notices. The rendered demo videos and GIFs are showcase media, not reusable product assets. The app screenshots, icons and mascots in `examples/*/assets/` belong to their apps and aren't covered by MIT ([details](examples/README.md)). Standalone Apple badge artwork is excluded; motionable asks before downloading it from Apple. The original demo includes the badge as part of the finished promotional video. Optional voice dependency notices are in [tools/voice/NOTICE.md](tools/voice/NOTICE.md).
 
 ## Optional local voiceover
 
-The initial questions now offer a generated voice, your own recording, or music/effects only.
+The initial questions offer a generated voice, your own recording, or music/effects only.
 Generated speech uses Kokoro `af_heart` locally after optional setup (about 153 MB of downloads;
-Apple Silicon, US English). No paid account or transcription model. Supplied recordings do not need
+Apple Silicon, US English; Python 3 required for the optional voice commands). No paid account or transcription model. Supplied recordings do not need
 Kokoro. Approved audio stays with the film and renders offline. The first voice is fixed; preview it
 before approving a full take. See [voiceover workflow](docs/voiceover.md) for setup, script, import,
 approval, captions and revisions. Cloud voices and automatic transcription are not integrated.

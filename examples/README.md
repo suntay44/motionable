@@ -11,9 +11,9 @@ Each folder is a finished film: its plan (`DIRECTION.md`), its beat grid (`SCRIP
 | [owly-craft](owly-craft) | 16:9 · 15 s · craft benchmark | Real capacity screenshots, one persistent screen glide, a readable focus lift, supporting velocity path and selective temporal blur; deliberate reading holds |
 | [owly-wide](owly-wide) | 16:9 · 25 s · YouTube, a website | **Real screen recordings:** Mom types a task on her phone (the camera zooms in on the typing), it lands on her son's widget, he ticks it, "Done by Leo" arrives; the day-is-full bar; a drawn quill; piano and kalimba at 88 BPM |
 | [bonnie](bonnie) | 1:1 · 15 s · feeds | Night turns to morning in one shot and the watch answers "Ready"; the bedtime tile under a spotlight; a 3/4 music-box lullaby at 72 BPM |
-| [owly](owly) | 9:16 · 30 s | v0.1: the film motionable grew out of |
+| [owly](owly) | 9:16 · 30 s | Original design reference: stable headline hierarchy and one card connecting list, widget, circles, capacity, decisions and identity |
 
-Render one (macOS, about a minute):
+Render one on macOS (time varies with hardware and effects):
 
 ```bash
 bash scripts/run.sh examples/bonnie video
@@ -22,3 +22,5 @@ bash scripts/run.sh examples/bonnie video
 The MP4 lands in `examples/bonnie/out/bonnie.mp4`.
 
 **Assets.** The screenshots, icons, mascots and logos in `examples/*/assets/` belong to their apps (© 2026 Christian Patrick Suntay). They're here only to show what motionable makes, and they are **not** covered by the MIT licence: please don't reuse them. The Claude-drawn SVGs in `assets/drawn/` are MIT, like the code.
+
+The original Owly video in the README is the owner-supplied historical export, preserved as supplied. Its source is the legacy `owly` example; it predates the modern readability audit and has documented audit notes. It is a craft reference, not evidence that a new model run reproduces it. Official Apple badge artwork is optional: explicitly fetch it with `bash scripts/fetch-app-store-badge.sh examples/owly`, or render the text fallback from a clean checkout. The example never animates the badge.

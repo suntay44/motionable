@@ -1,7 +1,7 @@
 {
   "name": "motionable",
-  "version": "0.6.0",
-  "description": "Hype videos for your product, drawn in code on your Mac: reads your app, website or project, directs a one-of-a-kind film from its personality (plan mode), composes original music, and renders the MP4. macOS only; optional local Kokoro voiceover or supplied narration.",
+  "version": "0.7.0",
+  "description": "Product launch videos drawn in code on your Mac: reads your app, website or project, plans clear typography and visual storytelling, composes original music and renders an MP4. macOS only; optional local Kokoro voiceover or supplied narration.",
   "author": {
     "name": "Christian Patrick Suntay"
   },

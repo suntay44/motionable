@@ -22,5 +22,11 @@ SOFTWARE.
 
 ---
 
-The licence above covers motionable's code and documentation. The app screenshots, icons, mascots and logos in
+The licence above covers motionable's original code and documentation. The app screenshots, icons, mascots and logos in
 examples/*/assets/ are © their owners and are not licensed for reuse (see examples/README.md).
+
+Rendered demo videos and GIFs under docs/demos/ are showcase media containing the apps’ brand artwork.
+They are not licensed as reusable product assets. Code and documentation remain MIT licensed.
+
+Third-party-adapted optional voice helpers retain the notices and licences listed in tools/voice/NOTICE.md.
+Optional downloaded models and runtimes carry their own upstream licences.

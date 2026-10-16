@@ -133,9 +133,10 @@ Read `docs/motion-craft.md` for the artwork specification, action timing, shared
 
 Before a scene is animated, its settled frame has to work as a still picture. For each beat decide:
 - **The focal point:** one thing the eye goes to (usually the product's UI or the number), and where it sits.
-- **Where the words go**, in the format's safe band, on a margin the whole film shares.
+- **Where the words go**, in the format's safe band: a stable headline anchor and width, supporting-copy hierarchy and space for UI. Specify the grid once, then document deliberate exceptions.
 - **What fills the rest:** the product, a visual from its world, or deliberate space. Nothing empty by accident, nothing touching an edge by accident, no crop through UI.
-- **How it hands over** to the next beat: new text arrives after a see-through join, not during it.
+- **How it hands over** to the next beat: the visual identity carried forward, its before/after bounds and what that change explains. New text arrives after a see-through join, not during it.
+- **What the viewer learns**, in sequence: the question, action and result; the musical anchor supporting that result.
 
 These go in SCRIPT.md per beat, and the beats' settled moments become the film's `keyframes`.
 

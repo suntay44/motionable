@@ -4,16 +4,23 @@
 # usage: new.sh <film-dir> "<Product name>"
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-[ $# -ge 2 ] || { echo "usage: new.sh <film-dir> \"<Product name>\""; exit 2; }
+[ $# -eq 2 ] || { echo "usage: new.sh <film-dir> \"<Product name>\""; exit 2; }
 PROJ="$1"; NAME="$2"
-if [ -e "$PROJ/scenes" ]; then echo "$PROJ already has scenes/ — not overwriting."; exit 1; fi
+if [ -e "$PROJ" ] || [ -L "$PROJ" ]; then echo "$PROJ already exists — choose a new film directory."; exit 1; fi
+case "$NAME" in *$'\n'*|*$'\r'*) echo "Product name must be one line."; exit 2;; esac
+SLUG="$(printf '%s' "$NAME" | LC_ALL=C tr '[:upper:]' '[:lower:]' | LC_ALL=C tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$//')"
+[ -n "$SLUG" ] || SLUG=product
+# Escape independently for Swift string literals and sed replacement text.
+SWIFT_NAME="${NAME//\\/\\\\}"
+SWIFT_NAME="${SWIFT_NAME//\"/\\\"}"
+DOC_NAME="$(printf '%s' "$NAME" | sed 's/[\\&/]/\\&/g')"
+CODE_NAME="$(printf '%s' "$SWIFT_NAME" | sed 's/[\\&/]/\\&/g')"
 mkdir -p "$PROJ/scenes" "$PROJ/assets/drawn" "$PROJ/assets/fonts" "$PROJ/out" "$PROJ/engine"
 cp "$ROOT"/engine/*.swift "$PROJ/engine/"
 VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$ROOT/.claude-plugin/plugin.json")"
 echo "$VERSION" > "$PROJ/engine/VERSION"
-SLUG="$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//; s/-$//')"
-sed "s/{{PRODUCT}}/$NAME/g; s/{{SLUG}}/$SLUG/g" "$ROOT/templates/Film.swift" > "$PROJ/scenes/Film.swift"
-sed "s/{{PRODUCT}}/$NAME/g" "$ROOT/templates/DIRECTION.md" > "$PROJ/DIRECTION.md"
-sed "s/{{PRODUCT}}/$NAME/g" "$ROOT/templates/SCRIPT.md" > "$PROJ/SCRIPT.md"
+sed "s/{{PRODUCT}}/$CODE_NAME/g; s/{{SLUG}}/$SLUG/g" "$ROOT/templates/Film.swift" > "$PROJ/scenes/Film.swift"
+sed "s/{{PRODUCT}}/$DOC_NAME/g" "$ROOT/templates/DIRECTION.md" > "$PROJ/DIRECTION.md"
+sed "s/{{PRODUCT}}/$DOC_NAME/g" "$ROOT/templates/SCRIPT.md" > "$PROJ/SCRIPT.md"
 printf 'out/\n.build/\n' > "$PROJ/.gitignore"
 echo "created $PROJ (engine $VERSION copied in; scenes/Film.swift, DIRECTION.md, SCRIPT.md, assets/drawn, assets/fonts)"

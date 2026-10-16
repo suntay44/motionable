@@ -8,6 +8,6 @@ CACHE="${TMPDIR:-/tmp}/motionable-tools"
 BIN="$CACHE/compare"
 mkdir -p "$CACHE"
 if [ ! -x "$BIN" ] || [ "$ROOT/tools/compare.swift" -nt "$BIN" ]; then
-  swiftc -O "$ROOT/tools/compare.swift" -o "$BIN" 2>&1 | grep -E "error" || true
+  swiftc -O "$ROOT/tools/compare.swift" -o "$BIN"
 fi
 exec "$BIN" "$1"

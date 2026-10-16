@@ -32,7 +32,7 @@
 | 26.25 – 26.60 | 14 | **The widget shrinks into the app icon** | | The beat drops out, riser |
 | 26.50 | 14 | The icon lands | | **Thump**, final chord |
 | 26.75 / 26.90 / 27.05 | 14 | Lines rise in under the icon | **Owly the Scribe** · *To-do lists for the whole family.* · One purchase. No subscription. | Soft pops; the chord rings out |
-| 27.25 | 14 | Apple's official **Download on the App Store** badge cuts in and holds still. A glow ring pulses out behind it, outside its clear space (Apple doesn't allow animating the badge). `BADGE_GROW=1` renders a variant where the badge swells instead | | Bright pop and a soft ding |
+| 27.25 | 14 | Apple's official **Download on the App Store** badge cuts in and holds still. A glow ring pulses out behind it, outside its clear space (Apple doesn't allow animating the badge). | | Bright pop and a soft ding |
 | 27.75 | 14 | The whole frame blurs, and **Soon on Google Play** (plain text, no Google artwork) lands big in the middle | **Soon on Google Play** | Whoosh into a stamp |
 | 28.50 – 28.90 | 15 | The line shrinks into place under the badge while the frame sharpens | | Whoosh down, pop |
 | 28.90 – 30.00 | 15 | **Everything holds still** | | The chord fades to silence |

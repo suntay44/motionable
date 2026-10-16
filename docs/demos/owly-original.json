@@ -1,0 +1,10 @@
+{
+  "source": "Owner-supplied original Owly film, TODO-LIST-APP/Docs/HypeVideo/out/owly-hype.mp4",
+  "mp4": "owly-original.mp4",
+  "sha256": "45438630a04abac363112f71bf7a4ad184cfa7019874cd5bf0ff2d8eade8fb65",
+  "gif": "owly-original.gif",
+  "gif_sha256": "60eb73bbbae5604d4067747ba22574609d51f20f22f65e8085aae8330e937590",
+  "duration_seconds": 30,
+  "copyright": "2026 Christian Patrick Suntay. Showcase media; product artwork is not licensed for reuse under the code MIT license.",
+  "note": "Historical authored export preserved as supplied. Not a fresh model-run reproduction benchmark."
+}

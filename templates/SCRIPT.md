@@ -27,6 +27,11 @@ Keep exact spoken words in `assets/voice/script.json`; display words may differ 
 
 Approved manifest: <!-- assets/voice/narration.json, or none -->
 
+## Attention and explanation
+
+| Moment | Viewer question | Before → action → result | Headline position / hierarchy | Persistent identity / handoff | Musical anchor |
+|---|---|---|---|---|---|
+
 ## Action timing and continuity
 
 | Element identity | Primary / supporting | Anticipate / move / settle / read-hold (s) | Curve / path | Carries into next shot |

@@ -8,6 +8,6 @@ CACHE="${TMPDIR:-/tmp}/motionable-tools"
 BIN="$CACHE/inspect"
 mkdir -p "$CACHE"
 if [ ! -x "$BIN" ] || [ "$ROOT/tools/inspect.swift" -nt "$BIN" ]; then
-  swiftc -O "$ROOT/tools/inspect.swift" -o "$BIN" 2>&1 | grep -E "error" || true
+  swiftc -O "$ROOT/tools/inspect.swift" -o "$BIN"
 fi
 exec "$BIN" "$@"

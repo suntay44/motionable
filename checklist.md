@@ -19,6 +19,11 @@ Render a contact sheet: `run.sh <film> sheet` with no times shows the whole film
 Before scoring motion, run `run.sh <film> motion` and inspect the draft in playback plus the dense sequence sheets in `out/motion/`. Record observed timestamps, fixes and any unreviewed audio or timing in SCRIPT.md. Automated checks and contact sheets do not prove natural motion or good sound.
 
 Also check:
+- Headline anchors and hierarchy stay consistent; each intentional exception helps the composition.
+- A carried element keeps its identity through handoffs, and the change explains the next idea.
+- Product information arrives in a clear sequence; supporting motion directs attention rather than competing with the main action.
+- Musical accents support recognition, handoff, interaction and result, rather than arbitrary decoration.
+- Compare the moving film with any user-selected reference. A passing audit or a high self-score does not override the user’s judgment of typography and motion.
 - Mid-transition stills: shapes and text shouldn't look broken or collide in an ugly way. Briefly odd is fine; a mess is not.
 - The final hold frame: is it a good thumbnail on its own?
 - The longest line at the auto-fit size: is it still big enough?

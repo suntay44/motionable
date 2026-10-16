@@ -22,7 +22,7 @@ The engine is plain Swift on Apple's built-in frameworks (Core Graphics, Core Te
 | `storyboard` | `out/storyboard.png`: each beat's settled keyframe (`Film(keyframes:)`, or each scene's end), large, each audited on its own. Lay the film out and pass this before animating |
 | `motion [centers …]` | A draft MP4 plus dense sequence sheets and sampled timestamps in `out/motion/`; review moving actions, not just settled frames |
 | `draft` | `out/<name>-draft.mp4`: half size at 30 fps, about 3× faster, for your own review |
-| `video` | `out/<name>.mp4` (H.264 + AAC). About 20–45 s for 30 s at 60 fps |
+| `video` | `out/<name>.mp4` (H.264 + AAC). Render time varies by Mac and layers; typically minutes for complex 30-second films |
 | `video effects` | `out/<name>-effects.mp4`: the sound effects only, where they sit in the full mix, so a platform sound or a licensed track can go on top |
 
 `bash ROOT/scripts/compare.sh <film>` checks how much the film *sounds* like the other films in the studio (harmony, timbre, groove; above 0.85 prompts review for unintended reuse).
@@ -260,3 +260,5 @@ ducks the mastered bed and adds speech after musical effects. It never loads Kok
 the voice stem; `out/captions.srt` contains phrase subtitles. Burned-in captions use ordinary scene text.
 
 For a recording camera that changes its crop while fitting a flexible card, `drawFootage(..., camera: true)` labels camera-edge advice separately from fixed crop failures. Set it only during the actual move; fixed and moving classifications remain independent.
+
+Exports are rendered and muxed to unique temporary files. A successful export replaces the previous MP4; ordinary render/export errors preserve it. Required image assets still need valid files before rendering.

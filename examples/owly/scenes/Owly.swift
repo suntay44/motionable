@@ -5,7 +5,7 @@
 import AppKit
 
 func makeFilm() -> Film {
-    Film(name: badgeGrows ? "owly-hype-badge-grows" : "owly-hype", width: 1080, height: 1920, fps: 60,
+    Film(name: "owly-hype", width: 1080, height: 1920, fps: 60,
          duration: 30, bpm: 120, holdFrom: T.still, draw: owlyFrame, score: owlyScore)
 }
 
@@ -487,12 +487,12 @@ func themeName(_ t: Double) {
 
 /// Apple's official badge (Docs/HypeVideo/assets). Apple's rules: never modify, angle or animate it,
 /// and keep a quarter of its height clear around it. It cuts in on the beat and holds still.
-let badgeImage = loadSVG("assets/download-on-the-app-store-black-en-us.svg", height: 120)
+let badgeImage: CGImage? = FileManager.default.fileExists(atPath: projectDir.appendingPathComponent("assets/download-on-the-app-store-black-en-us.svg").path) ? loadSVG("assets/download-on-the-app-store-black-en-us.svg", height: 120) : nil
 let badgeR: CGRect = {
-    let h: CGFloat = 120, w = h * CGFloat(badgeImage.width) / CGFloat(badgeImage.height)
+    let h: CGFloat = 120, w = h * (badgeImage.map { CGFloat($0.width) / CGFloat($0.height) } ?? 3)
     return CGRect(x: 540 - w / 2, y: 1200, width: w, height: h)
 }()
-let badgeGrows = ProcessInfo.processInfo.environment["BADGE_GROW"] == "1"
+let badgeGrows = false // Official artwork stays still.
 let googleSmall = (size: CGFloat(38), y: CGFloat(1418))
 
 func endFrame(_ t: Double) {
@@ -514,12 +514,11 @@ func endFrame(_ t: Double) {
         let ring = badgeR.insetBy(dx: -(34 + 70 * grow), dy: -(34 + 70 * grow))
         if !badgeGrows { stroke(rr(ring, ring.height / 2), white.alpha(CGFloat(0.7 * (1 - p))), 5) }
     }
-    // BADGE_GROW=1 renders the variant the badge swells and settles in. Apple's guidelines say not to animate
-    // the badge, so the default keeps it still.
-    let s = badgeGrows ? CGFloat(1 + 0.55 * sin(Double.pi * prog(t, T.badge, T.badge + 0.5))) : 1
-    let c = CGPoint(x: badgeR.midX, y: badgeR.midY)
-    drawImage(badgeImage, in: CGRect(x: c.x - badgeR.width * s / 2, y: c.y - badgeR.height * s / 2,
-                                     width: badgeR.width * s, height: badgeR.height * s))
+    if let badgeImage {
+        drawImage(badgeImage, in: badgeR)
+    } else {
+        text("On the App Store", 40, .semibold, white, 540, badgeR.midY + 14, align: 0.5)
+    }
 }
 
 /// "Soon on Google Play" (plain text, no Google artwork): lands big over a blurred frame, then settles under the badge.

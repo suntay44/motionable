@@ -2,6 +2,18 @@
 
 Use this when planning artwork, timing, continuity and moving-sequence review. A reference is useful for observed design and timing; it does not establish the author's tools or source code. Record what was observed and what is inferred. Build original work from the product's evidence.
 
+## Story-led motion: five principles
+
+The original [Owly film](../docs/demos/owly-original.mp4) is a concrete design reference, with source in [examples/owly](../examples/owly). It demonstrates effective hierarchy and visual continuity; it is a historical authored film, not proof that a fresh model run will reproduce it. Adapt these principles to the product, rather than copying Owly’s palette, family story or coordinates:
+
+1. **Strong, consistent headline placement and hierarchy.** Define a headline anchor, maximum width, line spacing, and headline/supporting/UI hierarchy before animating. Keep those roles stable across scenes; change placement when the composition has a reason. Animate the message into that grid. Do not scatter labels around screenshots to fill space.
+2. **A visual element carrying the story.** Choose a visual thread when it connects the product’s ideas: a card, document, task or screen. Plan its before/after bounds and what it becomes at each handoff. Owly’s dot → list → widget → circles → capacity bar → decision card → icon shows how related shapes can connect features. Draw a persistent identity once; a sequence of unrelated wipe effects is not a continuous transformation. Do not force an arbitrary morph between unrelated features.
+3. **Motion explaining features and directing attention.** Write what the viewer should notice before and after each action. Entry leads to a recognized time; a tap leads to a checked task; a growing bar explains capacity. Supporting motion follows that causal action. A flourish needs a job, such as signaling the next focal point or completion.
+4. **Information revealed in sequence.** Order the product story as a series of viewer questions: what is it, how does it help, what changes when I act, what should I do next? Introduce one main idea at a time and hold its proof. A dense brief can show more features, but must still establish relationships; simultaneous screens and captions are not automatically more informative.
+5. **Music supporting meaningful transitions.** Mark semantic anchors in SCRIPT.md: recognition, handoff, completion, overload, resolution and identity. Place musical changes and cues around those events. Let reading pauses breathe. Owly’s widget reveal gets a drop, offline use changes the music’s filtering, and the icon landing gets the ending chord; energy follows the explanation.
+
+In DIRECTION.md record the type grid, visual thread and information order. In SCRIPT.md record the before/action/result, handoff and sound anchor per moment. Review the moving film against the user’s reference: is attention guided as clearly, or have extra effects diluted the explanation? If the user says the result is cluttered, revise hierarchy and continuity before adding effects or accelerating cuts. Automated checks cannot judge those preferences.
+
 ## Artwork before animation
 
 Write an artwork specification in DIRECTION.md: each asset's source, role, palette, material or texture, line weight, crop and scale, and whether it is product evidence or an illustration. Use supplied logos, mascots and screenshots unchanged. Pick one treatment for newly drawn illustrations and judge them together at delivery size. A texture such as halftone is optional, chosen for the brand; applying it to all UI can destroy evidence and readability. Avoid adding a new material or visual style for every shot.

@@ -1,4 +1,5 @@
 import AppKit
+import AVFoundation
 
 func near(_ a: Double, _ b: Double, tolerance: Double = 1e-6) { precondition(abs(a-b) < tolerance, "\(a) != \(b)") }
 for curve in [MotionCurve.linear, .easeIn, .easeOut, .easeInOut, .bezier(0.22, 1, 0.36, 1), .spring(response: 0.45, damping: 0.8), .spring(response: 0.4, damping: 1)] {
@@ -95,3 +96,32 @@ precondition(layoutLog!.slices.values.contains { $0.camera })
 precondition(layoutLog!.slices.values.contains { !$0.camera }, "fixed crop failure was downgraded by a camera advisory")
 layoutLog = nil
 print("motion: camera advisories and settled crop failures remain separate")
+
+// A failed re-render must preserve a user's previous export; a successful one replaces it.
+let work = FileManager.default.temporaryDirectory.appendingPathComponent("motionable-export-" + UUID().uuidString)
+try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+defer { try? FileManager.default.removeItem(at: work) }
+projectDir = work
+prepare(Film(name: "preserved", width: 64, height: 64, fps: 12, duration: 0.5, holdFrom: 0,
+             draw: { _ in fill(fullCanvas(), Col(0x123456)) }, score: { _ in }))
+let exportURL = work.appendingPathComponent("preserved.mp4"), previous = Data("previous user export".utf8)
+try previous.write(to: exportURL)
+var failed = false
+do { _ = try await renderVideo(to: work, audio: work.appendingPathComponent("missing.m4a")) }
+catch { failed = true }
+precondition(failed)
+let afterFailure = try Data(contentsOf: exportURL)
+precondition(afterFailure == previous, "failed render destroyed previous export")
+let remainingFiles = try FileManager.default.contentsOfDirectory(atPath: work.path)
+precondition(remainingFiles.allSatisfy { !$0.hasPrefix(".") })
+let tinyScore = Score(bpm: 120)
+let tinyAudio = try tinyScore.finish(to: work, duration: 0.5)
+_ = try await renderVideo(to: work, audio: tinyAudio)
+let afterSuccess = try Data(contentsOf: exportURL)
+precondition(afterSuccess != previous)
+let tinyAsset = AVURLAsset(url: exportURL)
+let tinyDuration = try await tinyAsset.load(.duration).seconds
+let tinyTracks = try await tinyAsset.loadTracks(withMediaType: .video)
+near(tinyDuration, 0.5, tolerance: 0.01)
+precondition(tinyTracks.count == 1)
+print("render: failure preserves previous export, success replaces it and temporary files are cleaned")

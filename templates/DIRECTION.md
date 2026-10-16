@@ -62,6 +62,14 @@
 
 Use supplied brand artwork unchanged. Specify a coherent treatment for newly drawn assets; test at delivery size. Keep effects off evidence screenshots and logos unless explicitly intended.
 
+## Type hierarchy and visual thread
+
+- Headline anchor, maximum width, line spacing and safe band:
+- Supporting copy and UI hierarchy; deliberate layout exceptions:
+- Visual thread and identity carried between ideas (or why separate shots serve this story):
+- Information order: what each moment lets the viewer understand next:
+- Musical anchors: reveal, interaction, result, resolution and ending:
+
 ## Choreography
 
 Primary action and supporting motion per shot; where the viewer reads and rests; curve and duration by object; identities carried between layouts. See `docs/motion-craft.md`.
