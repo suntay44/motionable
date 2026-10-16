@@ -13,7 +13,7 @@ import Foundation
 
 let args = CommandLine.arguments
 guard args.count >= 3 else {
-    print("usage: motionable <project-dir> audio|stills|sheet|video [seconds …]")
+    print("usage: motionable <project-dir> audio|stills|sheet|check|storyboard|motion|draft|video [seconds …]")
     exit(2)
 }
 projectDir = URL(fileURLWithPath: args[1]).standardizedFileURL
@@ -54,14 +54,15 @@ case "check":
 case "storyboard":
     try FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
     runStoryboard(to: out.appendingPathComponent("storyboard.png"))
-case "video", "draft":
+case "video", "draft", "motion":
+    if args[2] == "motion" { try writeMotionReview(times, to: out.appendingPathComponent("motion")) }
     let s = Score(bpm: film.bpm)
     film.score(s)
     s.narration = narration
     s.effectsOnly = effects
     let audio = try s.finish(to: out, duration: film.duration)
     let start = Date()
-    let url = try await renderVideo(to: out, audio: audio, draft: args[2] == "draft", suffix: s.effectsOnly ? "-effects" : (noVoice ? "-no-voice" : ""))
+    let url = try await renderVideo(to: out, audio: audio, draft: args[2] != "video", suffix: s.effectsOnly ? "-effects" : (noVoice ? "-no-voice" : ""))
     print(String(format: "wrote %@ in %.0f s", url.path, Date().timeIntervalSince(start)))
 default:
     print("unknown mode \(args[2])")

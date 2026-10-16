@@ -1,0 +1,29 @@
+{
+  "source_project": "TODO-LIST-APP",
+  "assets": [
+    {
+      "file": "child-widget.mp4",
+      "sha256": "6205f48eb1110b98add201498b64f4dd87cf61e1dd9525e94691430786f34168"
+    },
+    {
+      "file": "logo.png",
+      "sha256": "0e4e55d15f1e35b7c69f734f554555aab2f4f8f3efcf5c181c1583753cd98c2a"
+    },
+    {
+      "file": "parent-typing.mp4",
+      "sha256": "dc0fc3faea12329c1744f6b88f98d12b2dd90e8c18a82194e4b1e791173479e4"
+    },
+    {
+      "file": "screen-capacity.png",
+      "sha256": "625217b96b2f5e4b641d9edb5a17585850fb1ec0aaba6691a90fd7001576667a"
+    },
+    {
+      "file": "screen-parent-result.png",
+      "sha256": "a863d63231a39eb2e2a5fc8ead98471970b70b80a5ee6138458864112d81f247"
+    },
+    {
+      "file": "screen-routine.png",
+      "sha256": "bed630824e2d402fb1250923568ab1e400e077edb11558fcc4e5362c12223256"
+    }
+  ]
+}

@@ -57,7 +57,7 @@ Post a short summary: **name, pitch, top features, colours, price, platforms**, 
 
 - **Would you like a voiceover?** Generate a voice (downloads Kokoro on first use; local, no paid account) / Use my recording (no model download) / No voiceover (music and effects only). Ask only if not already answered; carry the answer and any audio paths into make. For generated voice, check `ROOT/scripts/voice.sh status`; if installed, say it uses the installed local engine. Explain English/Apple Silicon support and setup size from status before setup. Full workflow: `ROOT/docs/voiceover.md`, read only if voice is selected.
 
-**Image check:** you need **a logo + at least 3 product screenshots** that show different screens. If you're short, say what's missing and ask the user to drop files in. If they can't, offer a type-and-shapes film, and say plainly that it will show less of the product.
+**Image check:** gather enough real assets to prove the chosen story: use the supplied logo when available and screenshots or recordings of the states the film actually shows. Do not require three different screens for a single-feature film. Ask only for missing evidence; if it is unavailable, offer a type-and-shapes treatment grounded in verified product facts and explain which interactions cannot be demonstrated.
 
 ## 4. Hand off
 

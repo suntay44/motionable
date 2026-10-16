@@ -1,7 +1,7 @@
 // motionable tool: how much does this film SOUND like the other films in the studio?
 // Compares harmony (pitch-class profile), timbre (spectral shape) and groove (kick / snare / hat patterns per bar)
 // of <film>/out/music.m4a against every sibling film's out/music.m4a, using each film's tempo from beats.json.
-// Prints one line per film; "TOO SIMILAR" above 0.85 means viewers will hear the same track.
+// Prints one line per film; Similarity above 0.85 prompts review for accidental reuse; it is not a listening or quality assessment.
 //
 // build: swiftc -O tools/compare.swift -o <cache>/motionable-compare      usage: motionable-compare <film-dir>
 import AVFoundation
@@ -102,7 +102,7 @@ let siblings = ((try? FileManager.default.contentsOfDirectory(at: studio, includ
     .filter { $0.standardizedFileURL != film && FileManager.default.fileExists(atPath: $0.appendingPathComponent("out/music.m4a").path) }
     .sorted { $0.lastPathComponent < $1.lastPathComponent }
 if siblings.isEmpty { print("no other films in \(studio.path) yet — nothing to compare"); exit(0) }
-print("sound vs other films in the studio: harmony · timbre · groove → overall (above 0.85 = will feel the same)")
+print("sound vs other films in the studio: harmony · timbre · groove → overall (above 0.85 = review similarity)")
 var worst = 0.0
 for s in siblings {
     guard let x = decode(s.appendingPathComponent("out/music.m4a")) else { continue }
@@ -110,6 +110,6 @@ for s in siblings {
     let h = cosine(me.chroma, other.chroma), t = max(0, cosine(me.timbre, other.timbre)), g = max(0, cosine(me.groove, other.groove))
     let overall = (h + t + g) / 3
     worst = max(worst, overall)
-    print(String(format: "  %@  %.2f · %.2f · %.2f → %.2f%@", s.lastPathComponent, h, t, g, overall, overall > 0.85 ? "  TOO SIMILAR" : ""))
+    print(String(format: "  %@  %.2f · %.2f · %.2f → %.2f%@", s.lastPathComponent, h, t, g, overall, overall > 0.85 ? "  HIGH SIMILARITY" : ""))
 }
-print(worst > 0.85 ? "verdict: too close to another film — change the recipe (tempo, mode, drums, instruments, colour)" : "verdict: distinct")
+print(worst > 0.85 ? "verdict: high measured similarity — review whether reuse is intentional" : "verdict: distinct by this metric")

@@ -55,7 +55,7 @@ func noteCrop(_ name: String, image: CGImage, region: CGRect, camera: Bool) {
     if r.minX > 2 && (0..<3).contains(where: { lineBusy(image, col: x0 + $0, from: y0, to: y1) }) { cut.append("left") }
     if r.maxX < w - 2 && (1...3).contains(where: { lineBusy(image, col: x1 - $0, from: y0, to: y1) }) { cut.append("right") }
     for e in cut {
-        let key = "\(name): the crop's \(e) edge"
+        let key = "\(name): the crop's \(e) edge" + (camera ? " (camera)" : "")
         log.slices[key, default: ([], camera)].times.append(log.t)
     }
 }

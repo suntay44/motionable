@@ -74,7 +74,7 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 
 | Dial | Range |
 |---|---|
-| **Energy and pacing** | 1 calm … 5 relentless; shots of 2–7 s with 2–4 moves inside each, of varied lengths; where it peaks |
+| **Energy and pacing** | 1 calm … 5 relentless; shot lengths, primary actions, supporting movement and reading pauses chosen for the message; where it peaks |
 | **Tempo and feel** | 70–150 BPM; straight, swing (0.1–0.5), half-time, or 3/4 (a waltz or lullaby: `meter: 12`). Match the product's pace, not a habit |
 | **Tempo phases** *(optional)* | Most films keep one tempo. Change it only when the story moves that way and the user's brief allows it: a half-time groove under the problem, then the full groove at the reveal (`feel: .half`); a tape stop or a hit and a beat of silence into a new tempo; a ramp speeding into the drop or slowing into the end. Say why, from the evidence ("calm products stay steady") |
 | **Key and mode** | Any key. Major or lydian: open, bright. Mixolydian or dorian: groovy, cool, confident. Minor or phrygian: tense, dramatic. Pentatonic or blues: playful, soulful. Harmonic minor: exotic, cinematic |
@@ -84,12 +84,12 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 | **Room and colour** | Dry, room, studio, hall or cathedral; clean, warm, tape, lo-fi, bright or crushed |
 | **Signature sounds** | 2–4 effects from the product's world (sizzle, ka-ching, page flip, shutter, pen, coins, boing, bubbles, glitch…) for its key moments |
 | **Palette use** | Which brand colour leads and when; backgrounds (solid, gradient, paper, dark, pattern); one accent for emphasis |
-| **Type** | The product's own font if its file is available; otherwise a macOS face that matches its type personality (see ENGINE.md › Faces). Choose case, alignment, scale, **at least 2 entrance styles**, and an exit |
+| **Type** | The product's own font if its file is available; otherwise a macOS face that matches its type personality (see ENGINE.md › Faces). Choose case, alignment, scale, **a consistent entrance language**, and an exit |
 | **Type mix** | How faces and weights combine, read from the product's voice: one face in two weights (black + ultralight: modern, precise), a heavy sans with a serif italic for the emotional word (editorial, warm), a rounded face with a slant (soft, friendly), a condensed caps line over a light line (bold, sporty). At most 3 faces in a film; the mix goes on 1–2 words a line (`*accent*`, `{name:words}`), never whole paragraphs |
 | **Colour mix** | Which words get which colours: the base text colour plus 1–2 accents from the brand palette, with a job each (numbers, the benefit word, the product's name). Highlighter marks or underlines only if the brand already uses them. Every line keeps 3:1 contrast with what's behind it (`check` measures it) |
-| **Motion vocabulary** | How things enter and leave, the same way through the whole film: 3–5 motions from ENGINE.md › Entrances (`show`: pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip, spin) plus the text entrances. Calm products: fade, rise, zoom, wipe. Playful: pop, drop, flip, spin on small things. Crisp: slide, fly, wipe. Each kind of thing moves one way (screens one way, stickers another), so the motion reads as a language, not a sampler |
-| **Framing** | **At least 3** of: **footage of the app working (a recording, with a camera moving inside it)**, a whole screen, a snapped focus, a camera move inside a screen, a lifted callout, a row of screens, a fan of screens, a redrawn UI element with UI acting (typing, a finger, a state change), an illustration. If a recording exists, the signature moment uses it |
-| **Transitions** | A different kind at each boundary (≥3 kinds in 30 s, ≥2 in 15 s), each with a reason, matched to energy and personality: calm (dissolve, iris, morph, blob, dip, an in-shot colour shift), crisp (push, cover, uncover, columns, blinds), energetic (whip, zoom-through, slice, flash, glitch, pixelate), warm and analogue (burn) |
+| **Motion vocabulary** | How things enter and leave, the same way through the whole film: a small purposeful vocabulary from ENGINE.md › Entrances (`show`: pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip, spin) plus the text entrances. Calm products: fade, rise, zoom, wipe. Playful: pop, drop, flip, spin on small things. Crisp: slide, fly, wipe. Each kind of thing moves one way (screens one way, stickers another), so the motion reads as a language, not a sampler |
+| **Framing** | Choose the framing that proves each idea from: **footage of the app working (a recording, with a camera moving inside it)**, a whole screen, a snapped focus, a camera move inside a screen, a lifted callout, a row of screens, a fan of screens, a redrawn UI element with UI acting (typing, a finger, a state change), an illustration. If a recording exists, the signature moment uses it |
+| **Transitions** | Choose each boundary for continuity and story; repeating a join or keeping the shot is allowed. Carry a shared element when useful. Examples matched to energy and personality: calm (dissolve, iris, morph, blob, dip, an in-shot colour shift), crisp (push, cover, uncover, columns, blinds), energetic (whip, zoom-through, slice, flash, glitch, pixelate), warm and analogue (burn) |
 | **Camera** | Locked, slow push, glide inside screens, beat pulse, shake on impacts, handheld |
 | **Texture** | None, grain, paper, scanlines, halftone, light leaks, vignette, bloom, letterbox |
 | **Elements** | From ENGINE.md › Elements (stickers, tags, receipts, chat, notices, scribbles, arrows, confetti, sparkles, counters…), **plus any custom element this product needs**, built in the film's scenes |
@@ -99,17 +99,17 @@ Set every dial from the evidence. Write the reason as "because …", pointing at
 ## 4. Make it unique
 
 1. **Read the studio.** List the other films in the studio folder and read the `## Fingerprint` block of each one's DIRECTION.md.
-2. **Differ.** This film must differ from **every** other film on at least **5** fingerprint lines:
+2. **Differ.** Compare the fingerprint with other films to spot accidental template reuse. Differences must come from product evidence, not a numeric quota. Consider:
    - a tempo more than 12 BPM apart;
    - a different mode;
    - a different drum language, lead instrument, colour, type face, type mix, motion vocabulary, hook device or end-card device;
-   - at most 2 shared transition kinds.
+   - visual continuity and the product's own identity take priority over differing transition kinds.
 
-   If it collides, change dials. Change them for reasons, not at random, and keep the product's truth.
+   If it feels generic, revise the relevant choices for evidence-based reasons. A requested series can keep its established visual and musical language.
 3. **Seed.** Pick a new random `seed` for the recipe, so even similar choices play differently.
-4. **Check the sound.** After the audio exists, `scripts/compare.sh <film>` must report every other film at **0.85 or below**. If one is higher, change the recipe.
+4. **Check the sound.** After the audio exists, `scripts/compare.sh <film>` flags similarity above **0.85** for review. It measures sound similarity, not artistic quality. Change a reused bed when inappropriate; document intentional series reuse.
 
-Never reuse another film's hook device, signature moment layout or end-card layout unless the user asks for a series look.
+Review hook devices, signature layouts and end cards for accidental reuse. Repeat them intentionally when the product, story or requested series calls for it.
 
 ## 5. Ask about illustrations (one question, inside the approval step)
 
@@ -124,6 +124,10 @@ Ask whether Claude should **draw illustrations for this film**. Recommend it whe
 - **Image generators:** if the user has one connected (an image-generation tool or connector) and prefers it, offer it, and say up front that it may cost money.
 - **Never redraw** the user's logo, mascot or real UI. Use their files.
 - **Never imitate** another brand's characters or artwork.
+
+## 5a. Artwork and choreography
+
+Read `docs/motion-craft.md` for the artwork specification, action timing, shared-element handoffs and playback review. Record those decisions in DIRECTION.md and SCRIPT.md. Reference videos are evidence of visible treatment; distinguish observed frames/timing from inferred implementation. Never claim the reference's source code or toolchain without a source.
 
 ## 5b. Compose every frame
 

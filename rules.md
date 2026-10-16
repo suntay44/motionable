@@ -35,16 +35,16 @@ Source: [Google Play badge guidelines](https://partnermarketinghub.withgoogle.co
 ## Directed, not templated
 
 14. **Every look and sound choice is derived:** DIRECTION.md gives each dial a reason that points at evidence about the product (PLAN.md). No presets, and no copying another film, the Owly example included.
-15. **Unique in the studio:** at least 5 fingerprint lines differ from every other film in the studio, and `scripts/compare.sh` reports every other film at 0.85 or below. A series look only if the user asks for one.
-16. **Variety inside the film:** never the same join twice in a row, and at least 3 kinds of join in a 30 s film (2 in a 15 s cut); at least 3 kinds of framing (2 in 15 s) and at least 2 type entrances. No two scenes in a row share the same layout. Each join has a reason; motion for its own sake reads as a template.
+15. **Recognisable product identity:** review the fingerprint and sound comparison for accidental template reuse. Differences follow product evidence; no numeric difference quota. Document intentional series reuse.
+16. **Use a coherent motion language.** Choose framing, type entrances and joins for the story. Repeating a layout or transition is allowed when it establishes continuity; there is no minimum number of effects. A shared element may carry directly into the next composition.
 17. **The signature moment:** the product's most visual real interaction is in the film, redrawn to move exactly like the real UI.
 18. **Screens are never sliced:** show them through `drawScreen`, `ScreenMove`, `callout`, `screensRow` or `screensFan`, which fit whole screens or snap crops to the gaps between elements. Never clip a screenshot into a fixed box.
-19. **Hard cuts and joins land on the beat.** Every on-screen event has a matching sound, and every musical hit has something that moves.
+19. **Picture and sound share a timeline.** Place major accents on musical beats when it serves the story; let speech, reading and real UI interactions set their own timing. Sound supports meaningful actions. Stillness and unaccented movement are allowed.
 20. **Music is original, made in code.** Never a commercial track or a trending sound; the user can swap in a licensed track later.
 
 ## Craft (what viewers reward: RESEARCH.md › community check)
 
-25. **Ease, don't bounce.** Screens, headlines and cards ease out smoothly with no overshoot. Only small accents (stickers, icons, chips) may overshoot, and gently. Never blur text people need to read.
+25. **Give motion weight and purpose.** Use measured easing for readable screens and headlines. A restrained spring may suit a small accent or an illustrated object; overshoot must preserve readability and fit the product. Keep readable type sharp; optional temporal blur belongs on selected moving artwork.
 26. **No strobing.** At most three flashes in any second (WCAG 2.3.1); `check` fails a film that breaks it. Keep flash and glitch joins brief and rare.
 27. **The UI is legible.** When a screen's words carry the message, crop to the part that matters (a region, a callout, a camera move) instead of shrinking the whole screen.
 28. **Vary the shot lengths.** Shots of one length feel mechanical; `check` warns.

@@ -1,8 +1,7 @@
 # {{PRODUCT}} — beat grid
 
 <!-- Written in plan mode, at the tempo DIRECTION.md chose: one beat = 60 / BPM seconds, one bar = 4 beats.
-     Every time below becomes a constant in scenes/Film.swift's `T`. One row per moment; joins and hard cuts
-     land on beats; every row has a sound. "Reads in" = characters ÷ 15 + 0.4 s (at least 1 s): the line must stay fully on screen that long after its entrance. Reading should fill no more than about 60 % of the film. Approve this before any scene code is written. -->
+     Every time below becomes a constant in scenes/Film.swift's `T`. One row per moment; major accents can follow beats; real interactions and speech may use other times. Sound is optional per row. "Reads in" = characters ÷ 15 + 0.4 s (at least 1 s): the line must stay fully on screen that long after its entrance. Reading should fill no more than about 60 % of the film. Approve this before any scene code is written. -->
 
 **Tempo:** … BPM · beat = … s · bar = … s
 
@@ -27,3 +26,12 @@ Keep exact spoken words in `assets/voice/script.json`; display words may differ 
 |---|---|---|---|---|
 
 Approved manifest: <!-- assets/voice/narration.json, or none -->
+
+## Action timing and continuity
+
+| Element identity | Primary / supporting | Anticipate / move / settle / read-hold (s) | Curve / path | Carries into next shot |
+|---|---|---|---|---|
+
+## Motion review
+
+Render `motion`; inspect the draft and `out/motion/` sequences. Record timestamps, observed issues, changes and rerun results. State whether playback and audio were actually assessed; do not infer smoothness from contact sheets or intelligibility from levels.

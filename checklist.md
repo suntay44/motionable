@@ -1,6 +1,6 @@
 # motionable critique checklist
 
-Render a contact sheet: `run.sh <film> sheet` with no times shows the whole film plus the edges and middle of every join. Look at it, then score each category from 1 to 10. **Fix anything below 8**, re-render the sheet, and score again. Stop when everything is 8 or higher, or after three rounds. Then tell the user what's still weak.
+Render a contact sheet: `run.sh <film> sheet` with no times shows the whole film plus the edges and middle of every join. Look at it, then score each category from 1 to 10. **Fix anything below 8**, re-render the sheet, and score again. Stop when everything is 8 or higher, or after three rounds. Then tell the user what's still weak. Scores are subjective: justify them with observed timestamps and frames, and state what was not assessed.
 
 | Category | 8+ means |
 |---|---|
@@ -8,13 +8,15 @@ Render a contact sheet: `run.sh <film> sheet` with no times shows the whole film
 | **Composition** | `storyboard`: every keyframe ✓, one focal point each, a shared margin, nothing empty, cut or touching an edge by accident; `check`'s layout section has no ✗ and only ⚠ that DIRECTION.md explains |
 | **Readability** | `run.sh <film> check` says "readable": every line stays fully on screen for its reading time (15 characters/s + 0.4 s, at least 1 s), no text sits in the button zones, and every line has 3:1 contrast with what's behind it. Nothing overlaps |
 | **Story** | One core message; at most 3 benefits (2 in 15 s), each shown on real UI; the end card has icon, name, one line and a true text CTA |
-| **Motion** | Something moves on every beat; the motion vocabulary is consistent (each kind of thing enters and leaves one way); big things ease without bounce (only small accents overshoot); morphs connect scenes instead of hard-cutting between unrelated slides; nothing jitters; `check` prints "flashing: ✓" and "rhythm: ✓" |
+| **Motion** | Playback has a clear primary action, supporting movement and intentional pauses; acceleration and settling fit the object; shared elements keep their identity across layouts; nothing jitters; `check` prints "flashing: ✓" and "rhythm: ✓" |
 | **Brand** | Real colours, logo and screenshots; the type mix and colour accents match the product's voice, each accent with a job; looks like *this* product, not a template |
 | **Rules** | Everything in rules.md holds: claims verified, badges untouched, screens never sliced, phones upright, safe zones clear, final hold still |
-| **Sound** | The audio levels print sanely: muffled stretches read quieter than just before; effects line up with `T` times; no hit without picture; nothing of the stock "startup" formula (ukulele, whistling, swoosh-and-claps) |
-| **Variety** | Joins vary (never the same twice in a row; ≥3 kinds in 30 s, ≥2 in 15 s), ≥3 framings (2 in 15 s), ≥2 type entrances; no two neighbouring scenes share a layout; the signature moment is there and reads instantly |
-| **Distinctiveness** | `scripts/compare.sh <film>` prints "distinct" (every other film ≤ 0.85); the fingerprint differs from every other film on ≥5 lines; it would not be mistaken for another film in the studio |
+| **Sound** | The audio levels print sanely: muffled stretches read quieter than just before; effects line up with meaningful `T` events; silence and music-only beats are intentional; nothing of the stock "startup" formula (ukulele, whistling, swoosh-and-claps) |
+| **Variety** | Framings and joins serve the story; repeated layouts establish continuity; the signature moment is there and reads instantly; no effect exists only to satisfy a quota |
+| **Distinctiveness** | The product has its own visual identity; sound similarity and the fingerprint inform review rather than enforce arbitrary differences; deliberate series reuse is documented |
 | **Direction** | It feels like DIRECTION.md's personality (and never like its "Never"); every dial is visible in the cut |
+
+Before scoring motion, run `run.sh <film> motion` and inspect the draft in playback plus the dense sequence sheets in `out/motion/`. Record observed timestamps, fixes and any unreviewed audio or timing in SCRIPT.md. Automated checks and contact sheets do not prove natural motion or good sound.
 
 Also check:
 - Mid-transition stills: shapes and text shouldn't look broken or collide in an ugly way. Briefly odd is fine; a mess is not.

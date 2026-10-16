@@ -145,7 +145,7 @@ enum Appear {
 /// `length` is the entrance's duration; an exit takes 80 % of it. Text inside isn't counted as readable by `check`
 /// while it moves. Example: `show(card, t: t, from: T.cards, enter: .slide(.left)) { drawScreen(shot, in: card) }`.
 func show(_ rect: CGRect, t: Double, from: Double, until: Double? = nil, enter: Appear = .fade, exit: Appear = .fade,
-          length: Double = 0.45, _ draw: () -> Void) {
+          length: Double = 0.45, curve: MotionCurve? = nil, exitCurve: MotionCurve? = nil, _ draw: () -> Void) {
     guard t >= from else { return }
     let cutsIn: Bool = { if case .cut = enter { return true }; return false }()
     let cutsOut: Bool = { if case .cut = exit { return true }; return false }()
@@ -153,18 +153,18 @@ func show(_ rect: CGRect, t: Double, from: Double, until: Double? = nil, enter: 
     let pOut = until.map { u in length > 0 && !cutsOut ? prog(t, u - length * 0.8, u) : (t >= u ? 1 : 0) } ?? 0
     guard pOut < 1 else { return }
     let moving = pIn < 1 || pOut > 0
-    appearing(exit, visible: 1 - pOut, entering: false, rect) {
-        appearing(enter, visible: pIn, entering: true, rect) {
+    appearing(exit, visible: 1 - pOut, entering: false, rect, curve: exitCurve) {
+        appearing(enter, visible: pIn, entering: true, rect, curve: curve) {
             if moving { unlogged(draw) } else { draw() }
         }
     }
 }
 
 /// One motion at `visible` (0 hidden … 1 fully shown). Entrances ease out; exits ease in.
-func appearing(_ m: Appear, visible v: Double, entering: Bool, _ r: CGRect, _ draw: () -> Void) {
+func appearing(_ m: Appear, visible v: Double, entering: Bool, _ r: CGRect, curve: MotionCurve? = nil, _ draw: () -> Void) {
     if v >= 1 { draw(); return }
     guard v > 0 else { return }
-    let e = CGFloat(entering ? outCubic(v) : 1 - inCubic(1 - v))
+    let e = CGFloat(curve.map { entering ? $0.value(v) : 1 - $0.value(1-v) } ?? (entering ? outCubic(v) : 1 - inCubic(1 - v)))
     let c = CGPoint(x: r.midX, y: r.midY)
     var alpha: CGFloat = 1, scaleX: CGFloat = 1, scaleY: CGFloat = 1, dx: CGFloat = 0, dy: CGFloat = 0, rot: CGFloat = 0
     var clip: CGPath? = nil
@@ -172,12 +172,12 @@ func appearing(_ m: Appear, visible v: Double, entering: Bool, _ r: CGRect, _ dr
     case .cut: break
     case .fade: alpha = e
     case .pop:
-        let k = entering ? CGFloat(outBack(v, 1.5)) : e
+        let k = entering && curve == nil ? CGFloat(outBack(v, 1.5)) : e
         scaleX = 0.6 + 0.4 * k; scaleY = scaleX; alpha = CGFloat(min(1, v * 3))
     case .zoom: scaleX = 0.88 + 0.12 * e; scaleY = scaleX; alpha = e
     case .rise: dy = 80 * (1 - e); alpha = e
     case .drop:
-        let k = entering ? CGFloat(outBack(v, 1.3)) : e
+        let k = entering && curve == nil ? CGFloat(outBack(v, 1.3)) : e
         dy = -140 * (1 - k); alpha = CGFloat(min(1, v * 3))
     case .slide(let side):
         let d = (side == .left || side == .right ? W : H) * 0.18 * (1 - e)
@@ -213,7 +213,7 @@ func appearing(_ m: Appear, visible v: Double, entering: Bool, _ r: CGRect, _ dr
     if rot != 0 { ctx.rotate(by: rot) }
     ctx.scaleBy(x: scaleX, y: scaleY)
     ctx.translateBy(x: -c.x, y: -c.y)
-    ctx.setAlpha(alpha)
+    ctx.setAlpha(min(1, max(0, alpha)))
     ctx.beginTransparencyLayer(auxiliaryInfo: nil)        // so nested fades multiply, whatever `draw` does with alpha
     draw()
     ctx.endTransparencyLayer()

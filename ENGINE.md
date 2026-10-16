@@ -20,11 +20,12 @@ The engine is plain Swift on Apple's built-in frameworks (Core Graphics, Core Te
 | `audio` | `out/music.m4a` + `out/beats.json`, and prints levels |
 | `check` | Readability: every line of text that leaves before it can be read (15 characters/s + 0.4 s, at least 1 s, after its entrance finishes), text in the social apps' button zones, contrast, dead air, and flashing (more than three flashes a second fails). **Layout audit:** text overlapping text, text cut off by the frame or its card, crops slicing through UI (✗); text crossing during a see-through join, text covered by something, cameras cropping UI at rest, large empty stretches, uneven headline margins (⚠). It also reports what frame 1 says and whether the shot lengths vary |
 | `storyboard` | `out/storyboard.png`: each beat's settled keyframe (`Film(keyframes:)`, or each scene's end), large, each audited on its own. Lay the film out and pass this before animating |
+| `motion [centers …]` | A draft MP4 plus dense sequence sheets and sampled timestamps in `out/motion/`; review moving actions, not just settled frames |
 | `draft` | `out/<name>-draft.mp4`: half size at 30 fps, about 3× faster, for your own review |
 | `video` | `out/<name>.mp4` (H.264 + AAC). About 20–45 s for 30 s at 60 fps |
 | `video effects` | `out/<name>-effects.mp4`: the sound effects only, where they sit in the full mix, so a platform sound or a licensed track can go on top |
 
-`bash ROOT/scripts/compare.sh <film>` checks how much the film *sounds* like the other films in the studio (harmony, timbre, groove; above 0.85 is too similar).
+`bash ROOT/scripts/compare.sh <film>` checks how much the film *sounds* like the other films in the studio (harmony, timbre, groove; above 0.85 prompts review for unintended reuse).
 
 `bash ROOT/scripts/footage.sh <video> [sheet <s> … | frame <s> <out.png> | trim <from> <to> <out>]` reads a screen recording: its size and length, a timeline of where and when the screen changes (taps, typing, new screens, still stretches), contact sheets of chosen moments, a full-size frame to measure, and trims that keep full quality.
 
@@ -43,7 +44,7 @@ func makeFilm() -> Film {
 
 - `draw(t)` paints the frame at time `t` into the global `ctx` (top-left origin, pixels). `W` and `H` are the canvas size.
 - The engine clears the frame first and adds film grain after; the grain freezes from `holdFrom`.
-- `score(s)` fills a `Score`. Keep every time in an `enum T` on the beat grid (beat = 60/BPM).
+- `score(s)` fills a `Score`. Keep event times in an `enum T`; choose beat alignment where it serves the picture (beat = 60/BPM).
 
 ## Drawing basics
 
@@ -95,6 +96,10 @@ The older `Headline` + `drawHeadlines` and `stampScale`, `riseText` still work.
 | `screensRow([s1, s2, s3], in:, gap:, p:, vertical:)` | Screens side by side (or stacked), entering in turn |
 | `screensFan([s1, s2, s3], centre:, height:, spread:, p:)` | Flat fanned screens (2D, never tilted like a device photo) |
 | `canvasPoint(p, region:, drawnIn:)` | A screenshot pixel → canvas point (for taps, stickers, arrows); measure the pixel with `scripts/inspect.sh` |
+
+## Choreography and motion review
+
+See [docs/motion-craft.md](docs/motion-craft.md) for practical use and limits. `MotionCurve` provides linear, cubic easing, time-inverted cubic Bezier and finite spring curves. `show` accepts optional `curve` and `exitCurve`; omitting them preserves existing motion. `MotionPath` carries explicit velocities through timed point keys. `SharedElement` interpolates persistent bounds. `temporalLayer` optionally samples selected moving artwork across a shutter interval; keep readable type outside it. `Film(motionMoments:)` supplies important action centers for the `motion` command.
 
 ## Entrances and exits for anything
 
@@ -240,7 +245,7 @@ s.compose(recipe, [Section(from: 0, to: 2.3, energy: 1), Section(from: 2.3, to: 
 - **"Unable to type-check in reasonable time":** split the expression into typed `let`s.
 - **Wrong argument order** (`Kinetic`, `Part`, `Recipe`, `Film`): Swift wants them in declaration order. Copy the order above.
 - **Text:** draw it only with `text(…)`, `Kinetic` or the type helpers, which handle the top-left canvas. They also report to `check`. Wrap decorative or in-between text in `unlogged { … }` so `check` ignores it; counters that settle on a value are recognised on their own.
-- **Timing:** keep every time on the beat grid, or picture and music drift.
+- **Timing:** use one explicit timeline. Major accents can align to beats; speech, reading holds and real interactions need not be quantized.
 - **The final hold:** from `holdFrom` to the end, nothing may move.
 - **Render time:** about 1.5–4 s per second of film. Per-frame looks (`bloomed`, `postProcess`, big shadows) cost the most, so use them where they matter.
 
@@ -253,3 +258,5 @@ ducks the mastered bed and adds speech after musical effects. It never loads Kok
 `audio`/`video`/`draft` produce/use `out/mix.m4a`; `out/music.m4a` stays the unducked bed for compare.
 `video no-voice` exports a `-no-voice.mp4`; `video effects` remains effects only. `out/narration.m4a` is
 the voice stem; `out/captions.srt` contains phrase subtitles. Burned-in captions use ordinary scene text.
+
+For a recording camera that changes its crop while fitting a flexible card, `drawFootage(..., camera: true)` labels camera-edge advice separately from fixed crop failures. Set it only during the actual move; fixed and moving classifications remain independent.

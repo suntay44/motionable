@@ -8,7 +8,7 @@ func makeFilm() -> Film {
          holdFrom: T.hold, draw: frame, score: score)
 }
 
-// MARK: - Timeline: every time on the beat grid of the chosen tempo
+// MARK: - Timeline: explicit event times; align major accents to beats when useful
 
 enum T {
     static let bpm = 100.0                            // from DIRECTION › Tempo

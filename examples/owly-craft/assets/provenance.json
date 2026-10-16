@@ -1,0 +1,34 @@
+{
+  "assets": [
+    {
+      "file": "today.png",
+      "source_project": "TODO-LIST-APP",
+      "source": "Website/owly-today.png",
+      "sha256": "d9d248ffddd3a87b6aa6d2c21c8b6d55284ac5b511b089908d5def849397cc08"
+    },
+    {
+      "file": "over.png",
+      "source_project": "TODO-LIST-APP",
+      "source": "Website/owly-over-capacity.png",
+      "sha256": "bfd2c8472c6a22f5c541c7e51d4d7f97c5cd1eca07146125125cc19e168d09b3"
+    },
+    {
+      "file": "routine.png",
+      "source_project": "TODO-LIST-APP",
+      "source": "Website/owly-routine.png",
+      "sha256": "bed630824e2d402fb1250923568ab1e400e077edb11558fcc4e5362c12223256"
+    },
+    {
+      "file": "mascot.png",
+      "source_project": "TODO-LIST-APP",
+      "source": "Website/owly-mascot.png",
+      "sha256": "b8a2df3f89c38a9e78453dc2c6f6dde4b7119b9043029105f79b7073cf59a612"
+    },
+    {
+      "file": "logo.png",
+      "source_project": "TODO-LIST-APP",
+      "source": "Website/owly-logo.png",
+      "sha256": "0e4e55d15f1e35b7c69f734f554555aab2f4f8f3efcf5c181c1583753cd98c2a"
+    }
+  ]
+}

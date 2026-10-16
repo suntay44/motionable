@@ -5,6 +5,8 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0
+echo "== choreography regressions"
+bash "$ROOT/scripts/test-motion.sh" || fail=1
 echo "== optional narration regressions (offline; no model setup)"
 bash "$ROOT/scripts/test-voice.sh" || fail=1
 echo "== focused engine and footage regressions"

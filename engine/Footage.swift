@@ -179,13 +179,13 @@ struct Zoom {
 /// canvas with `canvasPoint(p, region: footageRegion(…), drawnIn: card)`.
 @discardableResult
 func drawFootage(_ f: Footage, at s: Double, region: CGRect? = nil, in box: CGRect, cover: Bool = false, radius: CGFloat = 44,
-                 shadow: Bool = true, alpha: CGFloat = 1, edge: Col = Col(0xFFFFFF)) -> CGRect {
+                 shadow: Bool = true, alpha: CGFloat = 1, edge: Col = Col(0xFFFFFF), camera: Bool = false) -> CGRect {
     let src = footageRegion(f, region, cover ? box : nil)
     let dest = cover ? box : fitted(src, in: box)
     guard let frame = f.frame(at: s) else {
         fill(rr(dest, radius), Col(0x000000, 0.2 * alpha)); return dest
     }
-    if region != nil { noteCrop(f.path, image: frame, region: src, camera: cover) }
+    if region != nil { noteCrop(f.path, image: frame, region: src, camera: cover || camera) }
     let k = dest.width / src.width
     let path = rr(dest, radius)
     ctx.saveGState()

@@ -4,6 +4,11 @@ out/
 .DS_Store
 # Apple badge artwork is never redistributed; users download it from Apple
 **/download-on-the-app-store*.svg
+**/app-store-badge.svg
 
 # local helper bytecode
 __pycache__/
+
+# Local audition experiments; not distributable example films
+/motionable-launch-test/
+/owly-voice-test/

@@ -1,0 +1,37 @@
+{
+  "source_project": "GamifiedBiblePersonalized",
+  "assets": [
+    {
+      "file": "app-icon.png",
+      "sha256": "81bc6ae6784abd5a97d87b0f9d84a3603f70a6d9aa29127fe8f9916f779054e2"
+    },
+    {
+      "file": "logo.png",
+      "sha256": "a6ff6fe844a84b8a70616b71035131eb8f29cdce13991ebe6bdc1ef4908e4a9e"
+    },
+    {
+      "file": "screen-comparison-stacked.png",
+      "sha256": "0e8062907021ea93cf6d1c3e5ae30a7fe9aee5c1826088694f3d0f268a9142b1"
+    },
+    {
+      "file": "screen-context.png",
+      "sha256": "a277f9b3439b4a3ae2bc69c889cae0521ef7be20267952e017e05cb6124aa2c1"
+    },
+    {
+      "file": "screen-home.png",
+      "sha256": "6b7882f3c941df280aa67a5938267d36f29f99165c7be9b1db80a278aae4011a"
+    },
+    {
+      "file": "screen-journey.png",
+      "sha256": "98b3a386a953bb5ff43613f242d6f7475549f960a4232b7490de9dee29a2732f"
+    },
+    {
+      "file": "screen-listening.png",
+      "sha256": "85abd200647e7955f512b54497ea9d0064befbd1ae52cb8d27de3d94ced78e59"
+    },
+    {
+      "file": "screen-reader.png",
+      "sha256": "5231d57d407adfc8d430f80c894c6f82f745d980dd4eaa7f117aa38a86acdfb6"
+    }
+  ]
+}

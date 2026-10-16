@@ -21,13 +21,18 @@ struct Film {
     var tempo: TempoMap? = nil
     /// Approved local narration manifest; nil keeps the original music-only path.
     var narration: String? = nil
+    /// Centers of important moving actions, for `motion` review sequences (in addition to joins/keyframes).
+    var motionMoments: [Double] = []
 }
 
 var film: Film!
+/// Actual render cadence, including half-size 30 fps drafts. Layer shutters follow this cadence.
+var renderFPS = 60
 
 func prepare(_ f: Film) {
     tempoMap = f.tempo ?? TempoMap(f.bpm)
     film = f
+    renderFPS = f.fps
     W = CGFloat(f.width); H = CGFloat(f.height)
     NS = Int(f.duration * Double(SR))
     registerProjectFonts()
@@ -87,6 +92,9 @@ func writeSheet(_ times: [Double], to url: URL) {
 func renderVideo(to dir: URL, audio: URL, draft: Bool = false, suffix: String = "") async throws -> URL {
     let scale: CGFloat = draft ? 0.5 : 1
     let fps = draft ? min(30, film.fps) : film.fps
+    let savedFPS = renderFPS
+    renderFPS = fps
+    defer { renderFPS = savedFPS }
     let outW = Int(CGFloat(film.width) * scale) / 2 * 2, outH = Int(CGFloat(film.height) * scale) / 2 * 2
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     let silent = dir.appendingPathComponent(".video-only.mp4"), out = dir.appendingPathComponent("\(film.name)\(draft ? "-draft" : "")\(suffix).mp4")

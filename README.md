@@ -3,7 +3,7 @@
 
 ### ⭐ Stars are appreciated! ⭐
 
-**One shot Hype Video with the latest AI Models**
+**Product launch videos with real app assets, directed motion and original music**
 
 **Hype videos for your product, drawn in code on your Mac.**
 A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders a ready-to-post MP4.
@@ -55,6 +55,18 @@ Three films for three real apps, each made from its repo with `/motionable:proje
 </table>
 
 **With sound:** [Ponda the Chef](https://github.com/suntay44/motionable/releases/latest/download/ponda-the-chef.mp4) · [Owly the Scribe](https://github.com/suntay44/motionable/releases/latest/download/owly-wide.mp4) · [Bonnie](https://github.com/suntay44/motionable/releases/latest/download/bonnie.mp4). Each film's plan and code are in [examples/](examples).
+
+## Energetic launch series
+
+Three newer vertical films use real product evidence with layered screens, focused UI, drawn accents and musical payoffs. Each includes independently timed 30-second and 15-second cuts. The source uses Motionable’s native Swift renderer; the visual research includes HyperFrames examples.
+
+<table><tr>
+<td align="center"><img src="docs/demos/owly-launch.gif" width="260" alt="Owly launch: parent task entry, family lists, real Home Screen tick, routines and daily capacity"><br><b>Owly</b><br>Real recordings · 120 BPM</td>
+<td align="center"><img src="docs/demos/ponda-launch.gif" width="260" alt="Ponda launch: recipe scaling, costs, grocery lists, exports and supplied panda mascot"><br><b>Ponda the Chef</b><br>Recipe maths · 128 BPM</td>
+<td align="center"><img src="docs/demos/dove-launch.gif" width="260" alt="Dove launch: offline reading, passage context, English and Spanish comparison, audio and Journey"><br><b>Dove</b><br>Study and discovery · 112 BPM</td>
+</tr></table>
+
+Plans, source, asset provenance and review limits: [Owly](examples/owly-launch), [Ponda](examples/ponda-launch), [Dove](examples/dove-launch). GIFs have no audio; render the full MP4s using each example’s README. Checks and export evidence are in [the validation report](docs/launch-series-validation.md). Official Apple badge files are excluded; an explicitly invoked download helper fetches them from Apple. Without the badge, these examples render text availability.
 
 ## Install
 
@@ -167,9 +179,11 @@ the hook is too slow; open on the widget instead
 
 - **Your real product:** your screenshots, colours and logo, and no invented features. Claims to double-check are listed for you.
 - **The app working:** give it a screen recording (from the Simulator, QuickTime or your phone) and it plays the real app: speeding through waits, zooming in where things happen, freezing on results, with a finger on every tap. No recording? It acts out the app on screenshots: typing with a caret, taps, screens changing.
-- **Directed, not templated:** no style presets. Plan mode sets about 16 dials from your product's evidence (tempo, key, drums, instruments, type, framing, transitions…). A new film must differ from every other film in your studio, and a sound comparison flags any track that would feel the same.
+- **Directed, not templated:** no style presets. Plan mode sets about 16 dials from your product's evidence (tempo, key, drums, instruments, type, framing, transitions…). A fingerprint and sound comparison help identify accidental reuse while preserving deliberate visual continuity.
 - **Type with character:** a film can mix faces, weights, italics, sizes and colours word by word, like a serif italic for the feeling phrase, bigger numbers, or a key word in the brand colour. Each accent has a job, and every line's contrast is measured.
 - **Motion for everything:** text has 13 entrances. Images, screens, cards and stickers can pop, zoom, fade, rise, drop, slide, fly, wipe, iris, blur, flip or spin in and out. Each film picks one motion vocabulary to match its feel.
+- **Choreographed motion:** adjustable easing and finite springs, paths with shared velocities, persistent elements between layouts, and optional temporal blur for selected artwork. Reading pauses and stillness are part of the plan.
+- **Moving-sequence review:** `motion` renders a draft and dense sequences around actions and joins. Automated checks measure specific faults; professional quality still needs visual playback review.
 - **Original music:** composed in code for each film, in any tempo, key, groove or meter (even a 3/4 lullaby), and synced to every cut. There's nothing to license.
 - **Readable by design:** every line is held for its reading time and keeps 3:1 contrast with what's behind it. Key text stays clear of the Reels, TikTok and Shorts buttons, and screens are never sliced.
 - **Storyboarded, then audited:** every beat is laid out as a still and checked before anything moves. A layout audit then catches what a careful eye would: overlapping or cut-off text, crops through the UI, text covered by a finger or a card, empty stretches and uneven margins.
@@ -246,7 +260,8 @@ for s in scratch website project make; do ln -s ~/.motionable/skills/$s ~/.agent
 - [rules.md](rules.md): what every film follows.
 - [checklist.md](checklist.md): the self-critique.
 - [RESEARCH.md](RESEARCH.md): the evidence.
-- `bash scripts/test.sh`: runs focused engine and footage regressions, renders every element, entrance, look and transition once, verifies the layout audit, then checks every example film.
+- `bash scripts/test-craft.sh`: renders the Owly craft benchmark, checks readability/layout, and decodes both video exports to verify dimensions, frame counts, timing, audio presence and the final hold.
+- `bash scripts/test.sh`: runs choreography, narration, engine and footage regressions, renders every element, entrance, look and transition once, verifies the layout audit, then checks every example film.
 - `bash scripts/regression.sh`: checks playback timing, sparse and rotated recordings, tempo maps, font caching and cut entrances with temporary fixtures.
 - `bash scripts/inspect.sh <screenshot> find <colour>`: measures UI for exact redraws.
 

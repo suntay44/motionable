@@ -47,13 +47,24 @@
 | Type mix (≤3 faces; which words) | | |
 | Colour mix (base + accents; each accent's job) | | |
 | Motion vocabulary (how screens, cards, small things and text enter and leave) | | |
-| Framing (≥3) | | |
-| Transitions (≥3 kinds in 30 s, ≥2 in 15 s) | | |
+| Framing (chosen for each idea) | | |
+| Transitions and shared-element handoffs | | |
 | Camera | | |
 | Texture | | |
 | Elements (+ custom) | | |
 | Illustrations | | |
 | End card | | |
+
+## Artwork specification
+
+| Asset / source | Role | Palette / material / line weight | Crop and scale | Verified or illustrative |
+|---|---|---|---|---|
+
+Use supplied brand artwork unchanged. Specify a coherent treatment for newly drawn assets; test at delivery size. Keep effects off evidence screenshots and logos unless explicitly intended.
+
+## Choreography
+
+Primary action and supporting motion per shot; where the viewer reads and rests; curve and duration by object; identities carried between layouts. See `docs/motion-craft.md`.
 
 ## Voiceover (optional)
 
@@ -80,7 +91,7 @@ Sections: <!-- [from–to energy] … -->
 
 ## Fingerprint
 
-<!-- One line each. Plan mode compares these with every other film in the studio (≥5 must differ). -->
+<!-- One line each. Plan mode compares these with every other film in the studio (review accidental reuse; preserve intentional series identity). -->
 - tempo:
 - mode:
 - drums:

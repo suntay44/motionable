@@ -1,0 +1,37 @@
+{
+  "source_project": "PandaChef",
+  "assets": [
+    {
+      "file": "logo-icon.png",
+      "sha256": "471317e2eacaf96846156f43e952b573a5b3c124ae1026c37c382ba0f38d8395"
+    },
+    {
+      "file": "mascot-pose-2.png",
+      "sha256": "aff4d40cc44fb9a2c973660ba0cce394a64267a3382c16da90e435e3ca023436"
+    },
+    {
+      "file": "screen-cart.png",
+      "sha256": "c28f9e073bb5547ed0068450d3df8c0a00c709f0fd8ca60ebc1380b6d93c5261"
+    },
+    {
+      "file": "screen-detail.png",
+      "sha256": "8ede646b35b81878105be9e594a42c9183c4caf20033103433a577df1f1a90a2"
+    },
+    {
+      "file": "screen-explore.png",
+      "sha256": "d41c054564cef6148441e0697beb53ee56342f6575ecfbc96b6045b35a21c60c"
+    },
+    {
+      "file": "screen-kitchen-sheet.png",
+      "sha256": "69d5bca6efef0a20189fb4bdd43e34d440104031389c2344cb4fbd87a090cb29"
+    },
+    {
+      "file": "screen-leftovers.png",
+      "sha256": "2b19e35645c3d3ad7a0e3a2c9794f6a5d27b1c2d7406a8aa6204815523cd810f"
+    },
+    {
+      "file": "screen-scaling.png",
+      "sha256": "ffeb0604a11acfbaa545476d88758198a6a687ec7ebc7a3cb1e54d1f931d6834"
+    }
+  ]
+}
