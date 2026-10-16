@@ -3,10 +3,12 @@
 
 ### ⭐ Stars are appreciated! ⭐
 
+**macOS only**
+
 **Product launch videos with real app assets, directed motion and original music**
 
 **Hype videos for your product, drawn in code on your Mac.**
-A Claude Code plugin that reads your app, website or project, plans a beat-synced film you approve, composes original music and renders an editable MP4.
+A Claude Code plugin and reusable Codex skills that read your app, website or project, plan a beat-synced film you approve, compose original music and render an editable MP4.
 
 Free · open source · macOS only · no extra setup for music-only films
 
@@ -15,12 +17,13 @@ Free · open source · macOS only · no extra setup for music-only films
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsuntay44%2Fmotionable%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=2ea44f)](https://github.com/suntay44/motionable/releases)
 ![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-D97757)
+![Codex skills](https://img.shields.io/badge/Codex-local%20skills-10a37f)
 ![macOS 15+](https://img.shields.io/badge/macOS-15%2B-555555)
 
 <br />
 </div>
 
-**motionable** is a free, open-source [Claude Code](https://claude.com/claude-code) plugin that turns your app's repo, your website or a few screenshots into a **15–30 second hype video**: a launch video, an app promo or a social ad. It plans the film from your product's personality, composes original music, audits text timing and layout, and renders the MP4 with Swift on your Mac. Visual quality and sound still need human review. You don't need After Effects, Remotion, ffmpeg or a subscription.
+**motionable** is a free, open-source video toolkit for **[Claude Code](https://claude.com/claude-code) and [Codex](#codex-local-skills)**. It turns your app’s repo, website or screenshots into a **15–30 second hype video**: a launch video, app promo or social ad. It plans the film from your product's personality, composes original music, audits text timing and layout, and renders the MP4 with Swift on your Mac. Visual quality and sound still need human review. You don't need After Effects, Remotion, ffmpeg or a subscription.
 
 ## Contents
 
@@ -34,7 +37,7 @@ Free · open source · macOS only · no extra setup for music-only films
 - [Built on research](#built-on-research)
 - [FAQ](#faq)
 - [Requirements](#requirements)
-- [Codex (experimental)](#codex-experimental)
+- [Codex (local skills)](#codex-local-skills)
 - [Contributing](#contributing)
 - [Licence](#licence)
 
@@ -83,7 +86,7 @@ Plans, source, asset provenance and review limits: [Owly](examples/owly-launch),
 
 ## Install
 
-In Claude Code:
+For Codex, use the [local skills setup](#codex-local-skills). For Claude Code, install the plugin:
 
 ```
 /plugin marketplace add suntay44/motionable
@@ -95,6 +98,8 @@ For Claude desktop, follow the current [plugin installation instructions](https:
 To update later, run `claude plugin marketplace update motionable`, then `claude plugin update motionable@motionable`.
 
 ## How to use it
+
+The commands below use Claude Code. Codex uses the same workflow through its installed skills; see [Codex setup and usage](#codex-local-skills).
 
 **1. Make one folder for all your videos** (your studio) and open Claude Code there:
 
@@ -217,10 +222,10 @@ motionable's structure follows what the platforms, ad data and practitioners agr
 ## FAQ
 
 **What is motionable?**
-A Claude Code plugin that makes motion-graphics hype videos for apps and products. It's free and open source, and it runs on macOS.
+A video toolkit distributed as a Claude Code plugin and reusable Codex skills. It makes motion-graphics hype videos for apps and products locally on macOS.
 
 **Is it free?**
-Yes. The plugin is MIT-licensed, with no render credits and no subscriptions. The planning runs in Claude Code on your own Claude plan.
+Yes. The plugin is MIT-licensed, with no render credits and no subscriptions. Planning runs through your own Claude Code or Codex access; the agent service may have its own usage limits or costs.
 
 **Does it work on Windows or Linux?**
 No. It renders with Apple's built-in frameworks (Core Graphics, Core Text, AVFoundation) through Swift, so it needs a Mac.
@@ -253,18 +258,25 @@ Yes. Tell Claude what to change, or edit `SCRIPT.md`, `DIRECTION.md` or `scenes/
 
 - macOS 15 or later
 - The Xcode command line tools (free): `xcode-select --install`
-- Claude Code (the CLI or the desktop app)
+- Claude Code or Codex with access to local Mac files and command execution
 - About 1 GB of free disk space while rendering
 
-## Codex (experimental)
+## Codex (local skills)
 
-The skills are plain Markdown, so Codex can load them, but motionable is tested in Claude Code:
+Motionable also works in Codex through its local skills. This workflow has been used during development to create films and run the engine checks on macOS. Claude Code’s `/plugin` installation and commands are specific to Claude Code; Codex loads the same Markdown skills and local scripts.
+
+Clone the repository and link its skills:
 
 ```bash
 git clone https://github.com/suntay44/motionable ~/.motionable
 mkdir -p ~/.agents/skills
 for s in scratch website project make; do ln -s ~/.motionable/skills/$s ~/.agents/skills/motionable-$s; done
 ```
+
+Open a local studio folder in Codex, select the installed Motionable project, website or scratch skill, and provide the product path, URL or brief. For example: “Use the Motionable project skill for `~/Projects/my-app`; make a 30-second vertical film plus a 15-second cut.” Keep the repository clone: the linked skills use its engine, scripts and templates. See [OpenAI’s skills documentation](https://learn.chatgpt.com/docs/build-skills).
+
+**ChatGPT:** rendering needs an agent environment with access to a Mac’s files and shell. The skill files alone do not provide that access. Hosted environments without Apple’s macOS frameworks cannot run this renderer; use a local Mac setup such as Codex for the documented workflow.
+
 
 ## Contributing
 
